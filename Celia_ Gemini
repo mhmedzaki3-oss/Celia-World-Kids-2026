@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="htmlRoot">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Celia World Kids 2026</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #feada6 100%);
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 16px; color: #382747; user-select: none;
+  }
+  .screen { display: none; width: 100%; max-width: 500px; }
+  .screen.active { display: block; }
+
+  /* الهيدر وزر اللغة */
+  .top-bar { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 500px; margin-bottom: 15px; }
+  .lang-btn {
+    background: #fff; border: 2px solid #ff70ad; border-radius: 12px;
+    padding: 6px 14px; font-weight: bold; color: #ff70ad; cursor: pointer; font-size: 14px;
+  }
+
+  .home-card {
+    background: white; border-radius: 25px; padding: 25px; text-align: center;
+    box-shadow: 0 10px 30px rgba(102,51,102,0.15); border: 3px solid #ffc0cb;
+  }
+  h1 { font-size: 28px; color: #8054be; margin-bottom: 8px; }
+  p.subtitle { font-size: 14px; color: #76667f; margin-bottom: 20px; }
+
+  .menu-btn {
+    background: linear-gradient(135deg, #ff70ad, #9b72ed); color: white;
+    border: none; border-radius: 18px; padding: 18px; font-size: 18px;
+    font-weight: bold; width: 100%; cursor: pointer; box-shadow: 0 4px 15px rgba(255,112,173,0.3);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: transform 0.1s;
+  }
+  .menu-btn:active { transform: scale(0.97); }
+
+  /* شاشة اللعبة */
+  .game-panel {
+    background: white; border-radius: 25px; padding: 20px;
+    box-shadow: 0 10px 30px rgba(102,51,102,0.15); border: 3px solid #ffc0cb;
+  }
+  .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+  .back-btn { background: #f1e7ff; color: #533675; border: none; border-radius: 10px; padding: 6px 12px; font-weight: bold; cursor: pointer; }
+  .score-badge { font-size: 15px; color: #ff70ad; font-weight: bold; }
+
+  .question-box { text-align: center; margin-bottom: 20px; background: #fff5fa; padding: 15px; border-radius: 18px; }
+  .big-symbol { font-size: 70px; margin: 10px 0; }
+  .prompt { font-size: 16px; color: #533675; font-weight: bold; }
+
+  /* 4 اختيارات لكل سؤال */
+  .choices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 15px; }
+  .choice-card {
+    background: #fff0f6; border: 2px solid #f5d8e8; border-radius: 16px;
+    padding: 15px; font-size: 38px; cursor: pointer; text-align: center;
+    min-height: 85px; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .choice-card:active { transform: scale(0.95); }
+  .choice-card.correct { background: #39b978; color: white; border-color: #2ecc71; }
+  .choice-card.wrong { background: #ff6b6b; color: white; border-color: #ee5253; }
+
+  .feedback { text-align: center; font-size: 18px; font-weight: bold; min-height: 30px; margin-top: 10px; color: #8054be; }
+
+  .progress-bar { background: #f1e7ff; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 15px; }
+  .progress-fill { height: 100%; background: #ff70ad; width: 0%; transition: width 0.3s ease; }
+
+  /* نافذة الدفع التجاري (Paywall) */
+  #paywallModal {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+    z-index: 9999; align-items: center; justify-content: center; padding: 20px;
+  }
+  .paywall-box {
+    background: white; border: 3px solid #ff70ad; border-radius: 22px;
+    padding: 25px; text-align: center; max-width: 360px; width: 100%; color: #382747;
+  }
+  .paywall-box h2 { color: #ff70ad; margin-bottom: 10px; }
+  .paywall-box p { font-size: 14px; line-height: 1.5; margin-bottom: 15px; color: #555; }
+  .paywall-box code { background: #f1e7ff; padding: 8px 12px; border-radius: 10px; display: inline-block; color: #8054be; font-size: 16px; font-weight: bold; margin: 8px 0; }
+  .paywall-box a { display: block; background: #25d366; color: white; padding: 12px; border-radius: 14px; text-decoration: none; font-weight: bold; margin-top: 15px; }
+  .paywall-box button { background: #eee; border: none; padding: 8px 16px; border-radius: 10px; margin-top: 10px; cursor: pointer; font-weight: bold; color: #555; }
+
+  .footer-copy { font-size: 11px; color: #76667f; text-align: center; margin-top: 25px; }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <button class="lang-btn" onclick="toggleLanguage()">🌐 <span id="langText">English</span></button>
+  <span style="font-size: 13px; font-weight: bold; color: #533675;">Celia World Kids 2026</span>
+</div>
+
+<!-- شاشة البداية -->
+<div class="screen active" id="homeScreen">
+  <div class="home-card">
+    <div style="font-size: 45px; margin-bottom: 10px;">🌸 🧸 🌸</div>
+    <h1 id="mainTitle">عالم سيليا الذكي</h1>
+    <p class="subtitle" id="mainSub">تطبيق تعليمي تفاعلي آمن للأطفال</p>
+    
+    <button class="menu-btn" onclick="startApp()">
+      <span>🎮</span> <span id="startBtnText">ابدأ التعلم واللعب</span>
+    </button>
+    <div class="footer-copy">حقوق الملكية © سيليا احمد محمد زكى</div>
+  </div>
+</div>
+
+<!-- شاشة اللعبة التعليمية -->
+<div class="screen" id="gameScreen">
+  <div class="game-panel">
+    <div class="game-header">
+      <button class="back-btn" onclick="goHome()" id="backBtnText">← القائمة</button>
+      <span class="game-title" id="gameTitleText" style="font-weight:bold; color:#8054be;">🔤 حروف وصور</span>
+      <span class="score-badge">⭐ <span id="scoreDisplay">0</span></span>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="question-box">
+      <div class="big-symbol" id="symbolDisplay">🦁</div>
+      <div class="prompt" id="promptText">اختر الصورة الصحيحة للكلمة:</div>
+    </div>
+
+    <!-- 4 اختيارات لكل سؤال -->
+    <div class="choices-grid" id="choicesContainer"></div>
+    <div class="feedback" id="feedbackMsg"></div>
+  </div>
+</div>
+
+<!-- نافذة الدفع للنسخة الكاملة (Guardrail Paywall) -->
+<div id="paywallModal">
+  <div class="paywall-box">
+    <h2 id="pwTitle">انتهت المحاولات المجانية! 🌟</h2>
+    <p id="pwDesc">لفتح النسخة الكاملة ومدى الحياة لطفلك، السعر <b>49 جنيهاً فقط!</b> تحويل عبر إنستاباي على الحساب:</p>
+    <code>mhmedzaki@instapay</code>
+    <a id="waLink" href="#" target="_blank">💬 أرسل إيصال التحويل على واتساب للتفعيل</a>
+    <button onclick="closePaywall()" id="pwClose">إغلاق</button>
+  </div>
+</div>
+
+<script>
+// إعدادات اللغات (عربي / إنجليزي)
+let currentLang = 'ar';
+
+const translations = {
+  ar: {
+    mainTitle: "عالم سيليا الذكي",
+    mainSub: "تطبيق تعليمي تفاعلي آمن للأطفال",
+    startBtnText: "ابدأ التعلم واللعب",
+    backBtnText: "← القائمة",
+    gameTitleText: "🔤 حروف وصور",
+    promptText: "اختر الصورة الصحيحة:",
+    goodJob: "🎉 ممتازة يا بطلة!",
+    tryAgain: "❌ حاولي مرة أخرى!",
+    pwTitle: "انتهت المحاولات المجانية! 🌟",
+    pwDesc: "لفتح النسخة الكاملة ومدى الحياة لطفلك بـ <b>49 جنيهاً فقط!</b> حول عبر إنستاباي على:",
+    waText: "💬 أرسل إيصال التحويل على واتساب للتفعيل",
+    pwClose: "إغلاق"
+  },
+  en: {
+    mainTitle: "Celia World Kids",
+    mainSub: "Safe & Interactive Learning App for Kids",
+    startBtnText: "Start Learning & Playing",
+    backBtnText: "← Menu",
+    gameTitleText: "🔤 Letters & Pictures",
+    promptText: "Choose the correct picture:",
+    goodJob: "🎉 Well done!",
+    tryAgain: "❌ Try again!",
+    pwTitle: "Trial Ended! 🌟",
+    pwDesc: "Unlock the full lifetime version for <b>49 EGP only!</b> Transfer via InstaPay to:",
+    waText: "💬 Send transfer receipt on WhatsApp to activate",
+    pwClose: "Close"
+  }
+};
+
+function toggleLanguage() {
+  currentLang = currentLang === 'ar' ? 'en' : 'ar';
+  document.getElementById('htmlRoot').lang = currentLang;
+  document.getElementById('htmlRoot').dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+  document.getElementById('langText').textContent = currentLang === 'ar' ? 'English' : 'عربي';
+  
+  // تحديث النصوص الثابتة
+  const t = translations[currentLang];
+  document.getElementById('mainTitle').textContent = t.mainTitle;
+  document.getElementById('mainSub').textContent = t.mainSub;
+  document.getElementById('startBtnText').textContent = t.startBtnText;
+  document.getElementById('backBtnText').textContent = t.backBtnText;
+  document.getElementById('gameTitleText').textContent = t.gameTitleText;
+  document.getElementById('pwTitle').textContent = t.pwTitle;
+  document.getElementById('pwDesc').innerHTML = t.pwDesc;
+  document.getElementById('pwClose').textContent = t.pwClose;
+  document.getElementById('waLink').textContent = t.waText;
+}
+
+// رقم الواتساب الخاص بك لتحصيل الأرباح
+const MY_PHONE_NUMBER = "201000000000"; // استبدله برقمك الحقيقي
+document.getElementById('waLink').href = `https://wa.me/${MY_PHONE_NUMBER}?text=` + encodeURIComponent("مرحباً، أود تفعيل النسخة الكاملة لتطبيق Celia World Kids 2026 بقيمة 49 جنيه، وهذا إيصال التحويل عبر انستاباي");
+
+// أسئلة تعليمية بـ 4 اختيارات لكل سؤال
+const QUESTIONS_DATA = [
+  { letter: 'أ', word: 'أسد', emoji: '🦁', choices: ['🦁', '🐱', '🐶', '🐰'], correct: '🦁' },
+  { letter: 'ب', word: 'بطة', emoji: '🦆', choices: ['🐦', '🦆', '🐔', '🐧'], correct: '🦆' },
+  { letter: 'ت', word: 'تفاحة', emoji: '🍎', choices: ['🍌', '🍇', '🍎', '🍊'], correct: '🍎' },
+  { letter: 'ج', word: 'جمل', emoji: '🐪', choices: ['🐪', '🐘', '🦒', '🐎'], correct: '🐪' },
+  { letter: 'ح', word: 'حصان', emoji: '🐴', choices: ['🐮', '🐴', '🐑', '🐐'], correct: '🐴' },
+  { letter: 'س', word: 'سمكة', emoji: '🐟', choices: ['🐙', '🐟', '🦈', '🐬'], correct: '🐟' }
+];
+
+// نظام قفل النسخة التجريبية (Guardrail Paywall)
+let playCount = localStorage.getItem('celia_2026_plays') ? parseInt(localStorage.getItem('celia_2026_plays')) : 0;
+const MAX_FREE_PLAYS = 2; // محاولتان مجانيتان فقط
+
+function checkTrialLimit() {
+  const isUnlocked = localStorage.getItem('celia_2026_unlocked') === 'true';
+  if (isUnlocked) return true;
+
+  if (playCount >= MAX_FREE_PLAYS) {
+    document.getElementById('paywallModal').style.display = 'flex';
+    return false;
+  }
+  playCount++;
+  localStorage.setItem('celia_2026_plays', playCount);
+  return true;
+}
+
+function closePaywall() {
+  document.getElementById('paywallModal').style.display = 'none';
+}
+
+// نطق الصوت (Text-to-Speech محلي)
+function speakText(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = currentLang === 'ar' ? 'ar-EG' : 'en-US';
+  utterance.rate = 0.85;
+  window.speechSynthesis.spend ? null : window.speechSynthesis.speak(utterance);
+}
+
+// متغيرات اللعبة
+let currentIndex = 0;
+let score = 0;
+let answeredCurrent = false; // ضمان احتساب النجمة مرة واحدة فقط لكل سؤال
+
+function startApp() {
+  if (!checkTrialLimit()) return;
+  currentIndex = 0;
+  score = 0;
+  document.getElementById('homeScreen').classList.remove('active');
+  document.getElementById('gameScreen').classList.add('active');
+  document.getElementById('scoreDisplay').textContent = score;
+  loadQuestion();
+}
+
+function goHome() {
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  document.getElementById('gameScreen').classList.remove('active');
+  document.getElementById('homeScreen').classList.add('active');
+}
+
+function loadQuestion() {
+  answeredCurrent = false;
+  if (currentIndex >= QUESTIONS_DATA.length) {
+    currentIndex = 0; // إعادة التدوير بسلاسة
+  }
+  const q = QUESTIONS_DATA[currentIndex];
+  document.getElementById('symbolDisplay').textContent = q.emoji;
+  
+  const t = translations[currentLang];
+  document.getElementById('promptText').textContent = `${t.promptText} (${q.letter} - ${q.word})`;
+  document.getElementById('feedbackMsg').textContent = '';
+
+  const progress = ((currentIndex + 1) / QUESTIONS_DATA.length) * 100;
+  document.getElementById('progressFill').style.width = progress + '%';
+
+  // توليد 4 اختيارات في شبكة
+  const container = document.getElementById('choicesContainer');
+  container.innerHTML = '';
+  
+  // خلط الاختيارات عشوائياً
+  const shuffledChoices = [...q.choices].sort(() => Math.random() - 0.5);
+
+  shuffledChoices.forEach(emoji => {
+    const btn = document.createElement('div');
+    btn.className = 'choice-card';
+    btn.textContent = emoji;
+    btn.onclick = () => checkAnswer(emoji === q.correct, btn);
+    container.appendChild(btn);
+  });
+}
+
+function checkAnswer(isCorrect, btnElement) {
+  const t = translations[currentLang];
+  const fb = document.getElementById('feedbackMsg');
+
+  if (isCorrect) {
+    btnElement.classList.add('correct');
+    if (!answeredCurrent) {
+      answeredCurrent = true; // حماية ضد تكرار احتساب النقاط
+      score++;
+      document.getElementById('scoreDisplay').textContent = score;
+    }
+    fb.textContent = t.goodJob;
+    speakText(t.goodJob);
+
+    setTimeout(() => {
+      currentIndex++;
+      loadQuestion();
+    }, 1200);
+  } else {
+    btnElement.classList.add('wrong');
+    fb.textContent = t.tryAgain;
+    speakText(t.tryAgain);
+
+    setTimeout(() => {
+      btnElement.classList.remove('wrong');
+    }, 800);
+  }
+}
+</script>
+</body>
+</html>
