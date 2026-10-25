@@ -233,7 +233,6 @@ const GAMES = [
   { id: 'sounds',  icon: '🔊', ar: 'الأصوات',     en: 'Sounds',             available: false },
 ];
 
-// 4 choices per question
 const LETTERS_DATA = [
   { letter: 'أ', word: 'أسد', emoji: '🦁', choices: ['🦁', '🐱', '🐶', '🐘'], correctIndex: 0 },
   { letter: 'ب', word: 'بطة', emoji: '🦆', choices: ['🐦', '🦆', '🐔', '🦅'], correctIndex: 1 },
@@ -250,7 +249,7 @@ let currentIndex = 0;
 let stars = 0;
 let locked = false;
 
-// ============ Audio (Speech Synthesis & Beeps) ============
+// ============ Audio ============
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 let audioCtx = null;
 
@@ -273,13 +272,12 @@ function playTone(freq, duration, type = 'sine', vol = 0.1) {
 function playCorrect() { ensureAudio(); playTone(523, 0.1); setTimeout(() => playTone(659, 0.1), 100); setTimeout(() => playTone(784, 0.2), 200); }
 function playWrong() { ensureAudio(); playTone(300, 0.15, 'sawtooth'); setTimeout(() => playTone(220, 0.2, 'sawtooth'), 120); }
 
-// Text-to-Speech (Guardrail: Checks if supported, prevents errors)
 function speakText(text) {
   if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel(); // Stop previous
+    window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang === 'ar' ? 'ar-SA' : 'en-US';
-    utterance.rate = 0.9; // Slightly slower for kids
+    utterance.rate = 0.9;
     window.speechSynthesis.speak(utterance);
   }
 }
@@ -289,6 +287,7 @@ function renderHome() {
   document.getElementById('homeTitle').textContent = t.homeTitle;
   const grid = document.getElementById('gamesGrid');
   grid.innerHTML = '';
+  
   GAMES.forEach(game => {
     const card = document.createElement('div');
     card.className = 'game-card' + (game.available ? '' : ' disabled');
@@ -297,8 +296,13 @@ function renderHome() {
       <span class="name">${lang === 'ar' ? game.ar : game.en}</span>
       ${game.available ? '' : `<div class="soon">${t.soon}</div>`}
     `;
+    
+    // ربط حدث الضغط بشكل مباشر لضمان عمله
     if (game.available) {
-      card.onclick = () => { ensureAudio(); startGame(); };
+      card.onclick = function() { 
+        ensureAudio(); 
+        startGame(); 
+      };
     }
     grid.appendChild(card);
   });
@@ -378,23 +382,24 @@ function showScreen(id) {
 }
 
 // ============ Event Listeners ============
-document.getElementById('startAppBtn').onclick = () => {
+// ربط زر البداية
+document.getElementById('startAppBtn').onclick = function() {
   ensureAudio();
   showScreen('homeScreen');
-  renderHome();
+  renderHome(); // يتم استدعاؤها هنا لرسم الأزرار بعد ظهور الشاشة
 };
 
-document.getElementById('backBtn').onclick = () => {
+document.getElementById('backBtn').onclick = function() {
   showScreen('homeScreen');
   renderHome();
 };
 
-document.getElementById('winCloseBtn').onclick = () => {
+document.getElementById('winCloseBtn').onclick = function() {
   document.getElementById('winOverlay').classList.remove('show');
   startGame();
 };
 
-// Language Toggle (Long press on Title)
+// Language Toggle (Long press)
 let pressTimer = null;
 const titleEl = document.getElementById('homeTitle');
 const toggleLang = () => {
@@ -415,8 +420,6 @@ titleEl.addEventListener('mouseup', () => clearTimeout(pressTimer));
 titleEl.addEventListener('touchstart', () => { pressTimer = setTimeout(toggleLang, 800); });
 titleEl.addEventListener('touchend', () => clearTimeout(pressTimer));
 
-// ============ Boot ============
-// Initial render not strictly needed since welcome screen is active, but good for safety.
 </script>
 </body>
 </html>
