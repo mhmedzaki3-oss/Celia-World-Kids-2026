@@ -1,328 +1,193 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Celia Voice Lab | معمل سيليا الصوتي</title>
+<meta name="theme-color" content="#1a1a2e">
+<title>Celia Voice Lab</title>
 <style>
-:root{font-family:Arial,sans-serif;color:#183153;background:#eef6ff}
 *{box-sizing:border-box}
-body{margin:0;padding:18px}
-main{max-width:650px;margin:auto;background:white;border-radius:22px;
-padding:22px;box-shadow:0 8px 30px #18315318}
-h1{text-align:center;color:#2456a6;font-size:25px}
-.sub{text-align:center;color:#52657f}
-.animal{font-size:76px;text-align:center;margin:12px}
-#question{font-size:22px;text-align:center;min-height:62px}
-button,select{font-size:16px;padding:12px;border-radius:12px;
-border:1px solid #b8cbea;background:#f5f9ff;color:#183153}
-button{cursor:pointer}
-button:focus{outline:3px solid #f5c842}
-.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
-.answers{display:grid;gap:9px;margin-top:12px}
-.answers button{background:#e8f2ff}
-.primary{background:#2456a6!important;color:white!important}
-#feedback{padding:14px;border-radius:12px;background:#f5f8fc;
-min-height:50px;margin-top:14px;line-height:1.6}
-.meta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.small{font-size:13px;color:#60728a;line-height:1.6}
+body{margin:0;min-height:100vh;padding:22px;font-family:Tahoma,Arial,sans-serif;
+ background:#1a1a2e;color:#fff;display:flex;flex-direction:column;align-items:center;
+ justify-content:center;text-align:center}
+h1{color:#f3b43f}
+p{line-height:1.8}
+button,select{font:inherit}
+select{padding:10px;border-radius:10px;max-width:100%}
+.mic{width:120px;height:120px;border:0;border-radius:50%;background:#4a90e2;
+ color:white;font-size:48px;margin:22px;cursor:pointer;box-shadow:0 0 20px #4a90e266}
+.mic.listening{background:#e74c3c;animation:pulse 1s infinite}
+.mic:disabled{opacity:.45;cursor:not-allowed}
+@keyframes pulse{50%{transform:scale(1.07)}}
+.box{width:min(100%,500px);min-height:90px;padding:18px;margin-top:12px;
+ border-radius:14px;background:#ffffff15;border:1px solid #ffffff30;
+ overflow-wrap:anywhere;line-height:1.8}
+#result{font-weight:bold}
+.good{color:#54e69a}.bad{color:#ffd166}
+.hint{font-size:14px;color:#d1d5db}
 </style>
 </head>
 <body>
-<main>
-  <h1>🌟 عالم سيليا الصوتي</h1>
-  <p class="sub">نتعلم ونسمع ونتحدث — Learn & Speak</p>
+<h1>Celia Voice Lab 🎙️</h1>
+<p>اختر الكلمة، ثم اضغط الميكروفون وانطقها بوضوح.</p>
 
-  <div class="meta">
-    <label>اللغة:
-      <select id="lang">
-        <option value="ar-EG">العربية</option>
-        <option value="en-US">English</option>
-      </select>
-    </label>
-    <span id="score">النجوم: 0</span>
-  </div>
+<label for="target">الكلمة المطلوبة / Target</label>
+<br><br>
+<select id="target">
+ <option value="lion">أسد — Lion</option>
+ <option value="apple">تفاحة — Apple</option>
+</select>
 
-  <div class="animal" id="animal">🦁</div>
-  <div id="question">ما اسم هذا الحيوان؟</div>
+<button class="mic" id="micBtn" type="button" aria-label="ابدأ الاستماع">🎙️</button>
+<p id="micStatus" aria-live="polite">اضغط لبدء الاستماع.</p>
 
-  <div class="controls">
-    <button class="primary" id="speak">🔊 اسمع السؤال</button>
-    <button class="primary" id="listen">🎙️ أجب بصوتك</button>
-  </div>
-
-  <div class="answers" id="answers"></div>
-  <div id="feedback" role="status" aria-live="polite">
-    اختَر إجابة أو اضغط على زر الميكروفون.
-  </div>
-
-  <div class="controls">
-    <button id="repeat">🔁 إعادة السؤال</button>
-    <button id="next" class="primary">السؤال التالي ←</button>
-  </div>
-
-  <p class="small">
-    ملاحظة: التعرف على الصوت يعتمد على دعم المتصفح واللغة والاتصال.
-    يمكن اللعب بالأزرار إذا لم يعمل الميكروفون. لا تُدخل بيانات شخصية للطفل.
-  </p>
-</main>
+<div class="box">
+ <div id="heard">الكلام الذي يسمعه المتصفح سيظهر هنا.</div>
+ <div id="result" aria-live="polite"></div>
+</div>
+<p class="hint">
+قد يحتاج التعرف على الكلام إلى الإنترنت حسب المتصفح والجهاز.
+اسمح باستخدام الميكروفون عند الطلب.
+</p>
 
 <script>
 "use strict";
 
-/* قاعدة المعرفة التعليمية المحلية — لا تعتمد على إجابات مولّدة */
-const lessons = [
- {
-  emoji:"🦁",
-  ar:"ما اسم هذا الحيوان؟",
-  en:"What is this animal?",
-  optionsAr:["أسد","فيل","دلفين"],
-  optionsEn:["Lion","Elephant","Dolphin"],
-  accepted:["أسد","الأسد","اسد","lion"],
-  factAr:"الأسد حيوان ثديي، ويُعرف بأنه من الحيوانات المفترسة.",
-  factEn:"A lion is a mammal and a large predator."
- },
- {
-  emoji:"🐘",
-  ar:"أي حيوان له خرطوم طويل؟",
-  en:"Which animal has a long trunk?",
-  optionsAr:["قطة","فيل","فراشة"],
-  optionsEn:["Cat","Elephant","Butterfly"],
-  accepted:["فيل","الفيل","elephant"],
-  factAr:"الفيل يستخدم خرطومه في التقاط الأشياء وشرب الماء.",
-  factEn:"An elephant uses its trunk to pick up things and drink water."
- },
- {
-  emoji:"🐬",
-  ar:"الدلفين من الأسماك أم الثدييات؟",
-  en:"Is a dolphin a fish or a mammal?",
-  optionsAr:["سمكة","حيوان ثديي","طائر"],
-  optionsEn:["Fish","Mammal","Bird"],
-  accepted:["حيوان ثديي","ثديي","الثدييات","mammal","a mammal"],
-  factAr:"الدلفين من الثدييات؛ يتنفس الهواء ويُرضع صغاره.",
-  factEn:"A dolphin is a mammal. It breathes air and nurses its young."
- },
- {
-  emoji:"🐄",
-  ar:"ماذا نحصل عليه عادةً من البقرة؟",
-  en:"What do we commonly get from a cow?",
-  optionsAr:["الحليب","العسل","عصير البرتقال"],
-  optionsEn:["Milk","Honey","Orange juice"],
-  accepted:["حليب","الحليب","لبن","milk"],
-  factAr:"البقرة تنتج الحليب، ويُستخدم في صنع منتجات ألبان كثيرة.",
-  factEn:"Cows produce milk, which is used to make many dairy foods."
- },
- {
-  emoji:"🦋",
-  ar:"كم جناحًا للفراشة؟",
-  en:"How many wings does a butterfly have?",
-  optionsAr:["جناحان","أربعة أجنحة","ستة أجنحة"],
-  optionsEn:["Two wings","Four wings","Six wings"],
-  accepted:["أربعة","أربعة أجنحة","4","four","four wings"],
-  factAr:"للفراشة أربعة أجنحة: جناحان أماميان وجناحان خلفيان.",
-  factEn:"A butterfly has four wings: two forewings and two hindwings."
+const SpeechRecognition =
+ window.SpeechRecognition || window.webkitSpeechRecognition;
+
+const micBtn=document.getElementById("micBtn");
+const target=document.getElementById("target");
+const micStatus=document.getElementById("micStatus");
+const heard=document.getElementById("heard");
+const result=document.getElementById("result");
+
+let recognition=null;
+let isListening=false;
+let starting=false;
+
+function normalizeArabic(text){
+ return String(text||"")
+  .normalize("NFD")
+  .replace(/[\u064B-\u065F\u0670\u0640]/g,"")
+  .replace(/[أإآٱ]/g,"ا")
+  .replace(/ة/g,"ه")
+  .replace(/[^\u0600-\u06FFa-zA-Z0-9\s]/g," ")
+  .replace(/\s+/g," ")
+  .trim()
+  .toLowerCase();
+}
+
+function isNegated(text){
+ const words=normalizeArabic(text).split(/\s+/);
+ // فحص النفي في بداية العبارة، وكذلك قبل الكلمة المستهدفة.
+ const negations=new Set(["لا","ليس","ليست","مش","موش","مفيش","لم","لن","ما"]);
+ return words.some((word,index)=>
+  negations.has(word) &&
+  (index===0 || index<words.length-1)
+ );
+}
+
+function isExactAnswer(transcript,language){
+ if(isNegated(transcript))return false;
+ const answer=normalizeArabic(transcript);
+
+ const accepted={
+  lion:["اسد","الاسد"],
+  apple:["تفاح","التفاح","تفاحه","التفاحه"]
+ };
+ return accepted[language].includes(answer);
+}
+
+function stopUI(message){
+ isListening=false;
+ starting=false;
+ micBtn.classList.remove("listening");
+ micBtn.disabled=false;
+ if(message)micStatus.textContent=message;
+}
+
+function showResult(transcript){
+ // استخدام textContent لمنع تفسير الكلام المتعرف عليه كـ HTML.
+ heard.textContent="🗣️ قلت: "+transcript;
+ const selected=target.value;
+
+ if(isExactAnswer(transcript,selected)){
+  result.textContent="✅ إجابة صحيحة!";
+  result.className="good";
+ }else{
+  result.textContent=isNegated(transcript)
+   ?"❌ العبارة تحتوي على نفي. حاول قول الكلمة المطلوبة فقط."
+   :"❌ لم نتعرف على الكلمة المطلوبة. حاول مرة أخرى.";
+  result.className="bad";
  }
-];
-
-let index = 0;
-let stars = 0;
-let answered = new Set();
-let recognition = null;
-let listening = false;
-
-const $ = id => document.getElementById(id);
-const lang = () => $("lang").value;
-const english = () => lang() === "en-US";
-const lesson = () => lessons[index];
-
-function say(text) {
-  if (!("speechSynthesis" in window)) {
-    message(english()
-      ? "Speech playback is not supported in this browser."
-      : "المتصفح لا يدعم نطق الكلام.");
-    return;
-  }
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = lang();
-  utterance.rate = 0.88;
-  window.speechSynthesis.speak(utterance);
 }
 
-function message(text) {
-  $("feedback").textContent = text;
-}
+if(!SpeechRecognition){
+ micBtn.disabled=true;
+ micStatus.textContent=
+  "هذا المتصفح لا يدعم التعرف على الكلام. جرّب Chrome بإصدار حديث.";
+}else{
+ recognition=new SpeechRecognition();
+ recognition.lang="ar-EG";
+ recognition.interimResults=false;
+ recognition.continuous=false;
+ recognition.maxAlternatives=3;
 
-function render() {
-  const q = lesson();
-  $("animal").replaceChildren();
+ recognition.onstart=()=>{
+  starting=false;isListening=true;
+  micBtn.disabled=false;
+  micBtn.classList.add("listening");
+  micStatus.textContent="جاري الاستماع...";
+  result.textContent="";
+ };
 
-const animalImage = document.createElement("div");
-animalImage.textContent = q.emoji;
-animalImage.style.fontSize = "100px";
-animalImage.style.textAlign = "center";
-animalImage.style.minHeight = "125px";
-animalImage.style.display = "grid";
-animalImage.style.placeItems = "center";
-$("animal").appendChild(animalImage);
-  $("question").textContent = english() ? q.en : q.ar;
-  $("score").textContent = english()
-    ? `Stars: ${stars}`
-    : `النجوم: ${stars}`;
+ recognition.onresult=(event)=>{
+  const transcript=event.results?.[0]?.[0]?.transcript||"";
+  showResult(transcript);
+ };
 
-  $("answers").replaceChildren();
-  const options = english() ? q.optionsEn : q.optionsAr;
-
-  options.forEach(option => {
-    const button = document.createElement("button");
-    button.textContent = option;
-    button.disabled = answered.has(index);
-    button.addEventListener("click", () => checkAnswer(option));
-    $("answers").appendChild(button);
-  });
-
-  if (!answered.has(index)) {
-    message(english()
-      ? "Choose an answer or use the microphone."
-      : "اختَر إجابة أو استخدم الميكروفون.");
-  } else {
-    showCorrectFact();
-  }
-
-  $("next").textContent = index === lessons.length - 1
-    ? (english() ? "Start again ↻" : "ابدأ من جديد ↻")
-    : (english() ? "Next question →" : "السؤال التالي ←");
-}
-
-function normalize(text) {
-  return text.toLowerCase()
-    .replace(/[ًٌٍَُِّْـ]/g, "")
-    .replace(/[أإآ]/g, "ا")
-    .replace(/[.,!?؟،]/g, "")
-    .trim();
-}
-
-function checkAnswer(raw) {
-  if (answered.has(index)) return;
-
-  const answer = normalize(raw);
-  const q = lesson();
-  const correct = q.accepted.some(item =>
-    answer === normalize(item) ||
-    (answer.length >= 4 && normalize(item).length >= 4 &&
-     answer.includes(normalize(item)))
-  );
-
-  if (correct) {
-    answered.add(index);
-    stars++;
-    render();
-    showCorrectFact();
-    say(english() ? "Excellent! Correct answer." : "أحسنت! إجابة صحيحة.");
-  } else {
-    message(english()
-      ? "Not quite. Try again! You can choose an answer below."
-      : "مش بالضبط، حاول مرة أخرى! يمكنك اختيار إجابة من الأسفل.");
-    say(english() ? "Try again!" : "حاول مرة أخرى!");
-  }
-}
-
-function showCorrectFact() {
-  const q = lesson();
-  message(
-    (english() ? "⭐ Correct! " : "⭐ إجابة صحيحة! ") +
-    (english() ? q.factEn : q.factAr)
-  );
-}
-
-function startListening() {
-  const SR = window.SpeechRecognition ||
-             window.webkitSpeechRecognition;
-
-  if (!SR) {
-    message(english()
-      ? "Voice recognition is unavailable here. Please use the answer buttons."
-      : "التعرف على الصوت غير متاح في هذا المتصفح. استخدم أزرار الإجابة.");
-    return;
-  }
-
-  if (listening && recognition) {
-    recognition.stop();
-    return;
-  }
-
-  recognition = new SR();
-  recognition.lang = lang();
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 3;
-  recognition.continuous = false;
-  listening = true;
-  $("listen").textContent = english() ? "Listening…" : "أستمع إليك…";
-  message(english() ? "Speak now." : "اتكلم الآن.");
-
-  recognition.onresult = event => {
-    const alternatives = Array.from(event.results[0])
-      .map(result => result.transcript);
-    const match = alternatives.find(text =>
-      lesson().accepted.some(item =>
-        normalize(text).includes(normalize(item)) ||
-        normalize(item).includes(normalize(text))
-      )
-    );
-
-    if (match) {
-      checkAnswer(match);
-    } else {
-      message((english() ? "I heard: " : "سمعت: ") +
-        alternatives[0] + (english()
-        ? ". Please try again or choose below."
-        : ". حاول مرة أخرى أو اختر إجابة من الأسفل."));
-    }
+ recognition.onerror=(event)=>{
+  const messages={
+   "not-allowed":"يرجى السماح للمتصفح باستخدام الميكروفون.",
+   "service-not-allowed":"خدمة التعرف على الصوت غير متاحة.",
+   "no-speech":"لم نسمع صوتًا. حاول مرة أخرى.",
+   "audio-capture":"لم يتم العثور على ميكروفون متاح.",
+   "network":"حدث خطأ في الشبكة أو خدمة التعرف على الصوت.",
+   "aborted":"تم إيقاف الاستماع."
   };
+  micStatus.textContent=messages[event.error]||("تعذر التعرف على الصوت: "+event.error);
+  stopUI();
+ };
 
-  recognition.onerror = event => {
-    message((english() ? "Voice input issue: " : "مشكلة في الصوت: ") +
-      event.error + (english()
-      ? ". You can use the buttons instead."
-      : ". يمكنك استخدام الأزرار بدلًا من ذلك."));
-  };
+ recognition.onend=()=>{
+  if(isListening||starting)stopUI("انتهى الاستماع. اضغط الميكروفون للمحاولة مجددًا.");
+ };
 
-  recognition.onend = () => {
-    listening = false;
-    $("listen").textContent = english() ? "🎙️ Answer aloud" : "🎙️ أجب بصوتك";
-  };
+ target.addEventListener("change",()=>{
+  heard.textContent="الكلام الذي يسمعه المتصفح سيظهر هنا.";
+  result.textContent="";
+  result.className="";
+ });
 
-  try {
-    recognition.start();
-  } catch {
-    listening = false;
-    $("listen").textContent = english() ? "🎙️ Answer aloud" : "🎙️ أجب بصوتك";
-    message(english()
-      ? "Could not start the microphone. Please try again."
-      : "تعذر تشغيل الميكروفون. حاول مرة أخرى.");
+ micBtn.addEventListener("click",()=>{
+  if(!recognition)return;
+  if(isListening){
+   recognition.stop();
+   return;
   }
+  if(starting)return;
+  try{
+   starting=true;
+   micBtn.disabled=true;
+   micStatus.textContent="جارٍ تشغيل الميكروفون...";
+   recognition.start();
+  }catch(error){
+   stopUI("تعذر بدء الاستماع. انتظر لحظة ثم حاول مرة أخرى.");
+  }
+ });
 }
-
-$("speak").addEventListener("click", () => {
-  say(english() ? lesson().en : lesson().ar);
-});
-$("listen").addEventListener("click", startListening);
-$("repeat").addEventListener("click", () => {
-  say(english() ? lesson().en : lesson().ar);
-});
-$("next").addEventListener("click", () => {
-  if (index < lessons.length - 1) {
-    index++;
-  } else {
-    index = 0;
-    stars = 0;
-    answered.clear();
-  }
-  render();
-});
-$("lang").addEventListener("change", render);
-
-render();
 </script>
 </body>
 </html>
