@@ -1,0 +1,320 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Celia Voice Lab | معمل سيليا الصوتي</title>
+<style>
+:root{font-family:Arial,sans-serif;color:#183153;background:#eef6ff}
+*{box-sizing:border-box}
+body{margin:0;padding:18px}
+main{max-width:650px;margin:auto;background:white;border-radius:22px;
+padding:22px;box-shadow:0 8px 30px #18315318}
+h1{text-align:center;color:#2456a6;font-size:25px}
+.sub{text-align:center;color:#52657f}
+.animal{font-size:76px;text-align:center;margin:12px}
+#question{font-size:22px;text-align:center;min-height:62px}
+button,select{font-size:16px;padding:12px;border-radius:12px;
+border:1px solid #b8cbea;background:#f5f9ff;color:#183153}
+button{cursor:pointer}
+button:focus{outline:3px solid #f5c842}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.answers{display:grid;gap:9px;margin-top:12px}
+.answers button{background:#e8f2ff}
+.primary{background:#2456a6!important;color:white!important}
+#feedback{padding:14px;border-radius:12px;background:#f5f8fc;
+min-height:50px;margin-top:14px;line-height:1.6}
+.meta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.small{font-size:13px;color:#60728a;line-height:1.6}
+</style>
+</head>
+<body>
+<main>
+  <h1>🌟 عالم سيليا الصوتي</h1>
+  <p class="sub">نتعلم ونسمع ونتحدث — Learn & Speak</p>
+
+  <div class="meta">
+    <label>اللغة:
+      <select id="lang">
+        <option value="ar-EG">العربية</option>
+        <option value="en-US">English</option>
+      </select>
+    </label>
+    <span id="score">النجوم: 0</span>
+  </div>
+
+  <div class="animal" id="animal">🦁</div>
+  <div id="question">ما اسم هذا الحيوان؟</div>
+
+  <div class="controls">
+    <button class="primary" id="speak">🔊 اسمع السؤال</button>
+    <button class="primary" id="listen">🎙️ أجب بصوتك</button>
+  </div>
+
+  <div class="answers" id="answers"></div>
+  <div id="feedback" role="status" aria-live="polite">
+    اختَر إجابة أو اضغط على زر الميكروفون.
+  </div>
+
+  <div class="controls">
+    <button id="repeat">🔁 إعادة السؤال</button>
+    <button id="next" class="primary">السؤال التالي ←</button>
+  </div>
+
+  <p class="small">
+    ملاحظة: التعرف على الصوت يعتمد على دعم المتصفح واللغة والاتصال.
+    يمكن اللعب بالأزرار إذا لم يعمل الميكروفون. لا تُدخل بيانات شخصية للطفل.
+  </p>
+</main>
+
+<script>
+"use strict";
+
+/* قاعدة المعرفة التعليمية المحلية — لا تعتمد على إجابات مولّدة */
+const lessons = [
+ {
+  emoji:"🦁",
+  ar:"ما اسم هذا الحيوان؟",
+  en:"What is this animal?",
+  optionsAr:["أسد","فيل","دلفين"],
+  optionsEn:["Lion","Elephant","Dolphin"],
+  accepted:["أسد","الأسد","اسد","lion"],
+  factAr:"الأسد حيوان ثديي، ويُعرف بأنه من الحيوانات المفترسة.",
+  factEn:"A lion is a mammal and a large predator."
+ },
+ {
+  emoji:"🐘",
+  ar:"أي حيوان له خرطوم طويل؟",
+  en:"Which animal has a long trunk?",
+  optionsAr:["قطة","فيل","فراشة"],
+  optionsEn:["Cat","Elephant","Butterfly"],
+  accepted:["فيل","الفيل","elephant"],
+  factAr:"الفيل يستخدم خرطومه في التقاط الأشياء وشرب الماء.",
+  factEn:"An elephant uses its trunk to pick up things and drink water."
+ },
+ {
+  emoji:"🐬",
+  ar:"الدلفين من الأسماك أم الثدييات؟",
+  en:"Is a dolphin a fish or a mammal?",
+  optionsAr:["سمكة","حيوان ثديي","طائر"],
+  optionsEn:["Fish","Mammal","Bird"],
+  accepted:["حيوان ثديي","ثديي","الثدييات","mammal","a mammal"],
+  factAr:"الدلفين من الثدييات؛ يتنفس الهواء ويُرضع صغاره.",
+  factEn:"A dolphin is a mammal. It breathes air and nurses its young."
+ },
+ {
+  emoji:"🐄",
+  ar:"ماذا نحصل عليه عادةً من البقرة؟",
+  en:"What do we commonly get from a cow?",
+  optionsAr:["الحليب","العسل","عصير البرتقال"],
+  optionsEn:["Milk","Honey","Orange juice"],
+  accepted:["حليب","الحليب","لبن","milk"],
+  factAr:"البقرة تنتج الحليب، ويُستخدم في صنع منتجات ألبان كثيرة.",
+  factEn:"Cows produce milk, which is used to make many dairy foods."
+ },
+ {
+  emoji:"🦋",
+  ar:"كم جناحًا للفراشة؟",
+  en:"How many wings does a butterfly have?",
+  optionsAr:["جناحان","أربعة أجنحة","ستة أجنحة"],
+  optionsEn:["Two wings","Four wings","Six wings"],
+  accepted:["أربعة","أربعة أجنحة","4","four","four wings"],
+  factAr:"للفراشة أربعة أجنحة: جناحان أماميان وجناحان خلفيان.",
+  factEn:"A butterfly has four wings: two forewings and two hindwings."
+ }
+];
+
+let index = 0;
+let stars = 0;
+let answered = new Set();
+let recognition = null;
+let listening = false;
+
+const $ = id => document.getElementById(id);
+const lang = () => $("lang").value;
+const english = () => lang() === "en-US";
+const lesson = () => lessons[index];
+
+function say(text) {
+  if (!("speechSynthesis" in window)) {
+    message(english()
+      ? "Speech playback is not supported in this browser."
+      : "المتصفح لا يدعم نطق الكلام.");
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = lang();
+  utterance.rate = 0.88;
+  window.speechSynthesis.speak(utterance);
+}
+
+function message(text) {
+  $("feedback").textContent = text;
+}
+
+function render() {
+  const q = lesson();
+  $("animal").textContent = q.emoji;
+  $("question").textContent = english() ? q.en : q.ar;
+  $("score").textContent = english()
+    ? `Stars: ${stars}`
+    : `النجوم: ${stars}`;
+
+  $("answers").replaceChildren();
+  const options = english() ? q.optionsEn : q.optionsAr;
+
+  options.forEach(option => {
+    const button = document.createElement("button");
+    button.textContent = option;
+    button.disabled = answered.has(index);
+    button.addEventListener("click", () => checkAnswer(option));
+    $("answers").appendChild(button);
+  });
+
+  if (!answered.has(index)) {
+    message(english()
+      ? "Choose an answer or use the microphone."
+      : "اختَر إجابة أو استخدم الميكروفون.");
+  } else {
+    showCorrectFact();
+  }
+
+  $("next").textContent = index === lessons.length - 1
+    ? (english() ? "Start again ↻" : "ابدأ من جديد ↻")
+    : (english() ? "Next question →" : "السؤال التالي ←");
+}
+
+function normalize(text) {
+  return text.toLowerCase()
+    .replace(/[ًٌٍَُِّْـ]/g, "")
+    .replace(/[أإآ]/g, "ا")
+    .replace(/[.,!?؟،]/g, "")
+    .trim();
+}
+
+function checkAnswer(raw) {
+  if (answered.has(index)) return;
+
+  const answer = normalize(raw);
+  const q = lesson();
+  const correct = q.accepted.some(item =>
+    answer === normalize(item) ||
+    (answer.length >= 4 && normalize(item).length >= 4 &&
+     answer.includes(normalize(item)))
+  );
+
+  if (correct) {
+    answered.add(index);
+    stars++;
+    render();
+    showCorrectFact();
+    say(english() ? "Excellent! Correct answer." : "أحسنت! إجابة صحيحة.");
+  } else {
+    message(english()
+      ? "Not quite. Try again! You can choose an answer below."
+      : "مش بالضبط، حاول مرة أخرى! يمكنك اختيار إجابة من الأسفل.");
+    say(english() ? "Try again!" : "حاول مرة أخرى!");
+  }
+}
+
+function showCorrectFact() {
+  const q = lesson();
+  message(
+    (english() ? "⭐ Correct! " : "⭐ إجابة صحيحة! ") +
+    (english() ? q.factEn : q.factAr)
+  );
+}
+
+function startListening() {
+  const SR = window.SpeechRecognition ||
+             window.webkitSpeechRecognition;
+
+  if (!SR) {
+    message(english()
+      ? "Voice recognition is unavailable here. Please use the answer buttons."
+      : "التعرف على الصوت غير متاح في هذا المتصفح. استخدم أزرار الإجابة.");
+    return;
+  }
+
+  if (listening && recognition) {
+    recognition.stop();
+    return;
+  }
+
+  recognition = new SR();
+  recognition.lang = lang();
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 3;
+  recognition.continuous = false;
+  listening = true;
+  $("listen").textContent = english() ? "Listening…" : "أستمع إليك…";
+  message(english() ? "Speak now." : "اتكلم الآن.");
+
+  recognition.onresult = event => {
+    const alternatives = Array.from(event.results[0])
+      .map(result => result.transcript);
+    const match = alternatives.find(text =>
+      lesson().accepted.some(item =>
+        normalize(text).includes(normalize(item)) ||
+        normalize(item).includes(normalize(text))
+      )
+    );
+
+    if (match) {
+      checkAnswer(match);
+    } else {
+      message((english() ? "I heard: " : "سمعت: ") +
+        alternatives[0] + (english()
+        ? ". Please try again or choose below."
+        : ". حاول مرة أخرى أو اختر إجابة من الأسفل."));
+    }
+  };
+
+  recognition.onerror = event => {
+    message((english() ? "Voice input issue: " : "مشكلة في الصوت: ") +
+      event.error + (english()
+      ? ". You can use the buttons instead."
+      : ". يمكنك استخدام الأزرار بدلًا من ذلك."));
+  };
+
+  recognition.onend = () => {
+    listening = false;
+    $("listen").textContent = english() ? "🎙️ Answer aloud" : "🎙️ أجب بصوتك";
+  };
+
+  try {
+    recognition.start();
+  } catch {
+    listening = false;
+    $("listen").textContent = english() ? "🎙️ Answer aloud" : "🎙️ أجب بصوتك";
+    message(english()
+      ? "Could not start the microphone. Please try again."
+      : "تعذر تشغيل الميكروفون. حاول مرة أخرى.");
+  }
+}
+
+$("speak").addEventListener("click", () => {
+  say(english() ? lesson().en : lesson().ar);
+});
+$("listen").addEventListener("click", startListening);
+$("repeat").addEventListener("click", () => {
+  say(english() ? lesson().en : lesson().ar);
+});
+$("next").addEventListener("click", () => {
+  if (index < lessons.length - 1) {
+    index++;
+  } else {
+    index = 0;
+    stars = 0;
+    answered.clear();
+  }
+  render();
+});
+$("lang").addEventListener("change", render);
+
+render();
+</script>
+</body>
+</html>
