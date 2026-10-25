@@ -148,14 +148,25 @@ function applyLanguage(){
   if(help)help.textContent=T[lang].memoryHelp;
  }
 }
+
 function renderCurrentQuestionLanguage(){
- const title=$("questionTitle");
- if(title)title.textContent=activeGame==="match"?T[lang].target:T[lang].apples;
- const status=$("gameStatus");
- if(status&&status.dataset.msg==="retry")status.textContent=T[lang].retry;
- if(status&&status.dataset.msg==="correct")status.textContent=T[lang].correct;
- if(status&&status.dataset.msg==="finished")status.textContent=T[lang].countDone;
+  const title=document.getElementById("questionTitle");
+  if(title){
+    if(activeGame==="match"){
+      title.textContent=T[lang].target;
+    }else if(activeGame==="counting"){
+      title.textContent=T[lang].apples+" ("+state.countRound+"/10)";
+    }
+  }
+
+  const status=document.getElementById("gameStatus");
+  if(status){
+    if(status.dataset.msg==="retry")status.textContent=T[lang].retry;
+    if(status.dataset.msg==="correct")status.textContent=T[lang].correct;
+    if(status.dataset.msg==="finished")status.textContent=T[lang].finished;
+  }
 }
+
 function renderGamesMenu(){
  const grid=$("gamesGrid");
  if(!grid)return;
