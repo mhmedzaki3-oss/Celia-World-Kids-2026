@@ -1,319 +1,327 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" id="appRoot">
+<html lang="ar" dir="rtl" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#4a90e2">
 <title>Celia World Kids 2026</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    min-height: 100vh; display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 16px; color: #fff; user-select: none;
-  }
-  .container { width: 100%; max-width: 480px; }
-  .card {
-    background: rgba(255, 255, 255, 0.07);
-    border: 2px solid rgba(249, 202, 36, 0.3);
-    border-radius: 24px; padding: 24px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    backdrop-filter: blur(10px);
-  }
-  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-  .lang-btn {
-    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);
-    color: #f9ca24; padding: 6px 14px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 13px;
-  }
-  
-  h1 { font-size: 26px; text-align: center; color: #f9ca24; margin-bottom: 6px; }
-  p.sub { text-align: center; font-size: 13px; color: #a4b0be; margin-bottom: 25px; }
-
-  .primary-btn {
-    background: linear-gradient(135deg, #f9ca24, #f0932b); color: #1a1a2e;
-    border: none; border-radius: 16px; padding: 16px; font-size: 17px;
-    font-weight: bold; width: 100%; cursor: pointer; text-align: center;
-    box-shadow: 0 4px 15px rgba(249,202,36,0.4); transition: transform 0.1s;
-  }
-  .primary-btn:active { transform: scale(0.97); }
-
-  /* لوحة اللعبة */
-  .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-  .back-btn { background: rgba(255,255,255,0.15); color: #fff; border: none; border-radius: 10px; padding: 6px 12px; cursor: pointer; font-weight: bold; }
-  .score-box { color: #2ed573; font-weight: bold; font-size: 15px; }
-
-  .question-box { text-align: center; background: rgba(0,0,0,0.2); border-radius: 18px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
-  .emoji-display { font-size: 65px; margin-bottom: 10px; }
-  .prompt-text { font-size: 16px; color: #f1f2f6; font-weight: bold; }
-
-  /* 4 اختيارات في شبكة 2x2 */
-  .choices-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 15px; }
-  .choice-card {
-    background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.15);
-    border-radius: 16px; padding: 18px; font-size: 42px; cursor: pointer;
-    text-align: center; min-height: 90px; display: flex; align-items: center; justify-content: center;
-    transition: all 0.2s;
-  }
-  .choice-card:active { transform: scale(0.95); }
-  .choice-card.correct { background: rgba(46, 213, 115, 0.3); border-color: #2ed573; }
-  .choice-card.wrong { background: rgba(235, 77, 75, 0.3); border-color: #eb4d4b; }
-
-  .feedback-msg { text-align: center; font-size: 16px; font-weight: bold; min-height: 25px; margin-top: 10px; }
-
-  .progress-track { background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 20px; }
-  .progress-bar { height: 100%; background: #2ed573; width: 0%; transition: width 0.3s ease; }
-
-  /* شاشة الدفع التجاري (Paywall Modal) */
-  #paywallModal {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85);
-    z-index: 9999; align-items: center; justify-content: center; padding: 20px;
-  }
-  .paywall-content {
-    background: #16213e; border: 3px solid #f9ca24; border-radius: 22px;
-    padding: 25px; text-align: center; max-width: 360px; width: 100%;
-  }
-  .paywall-content h2 { color: #f9ca24; margin-bottom: 10px; font-size: 20px; }
-  .paywall-content p { font-size: 13px; color: #dfe6e9; line-height: 1.5; margin-bottom: 15px; }
-  .paywall-content code { background: #0f3460; color: #f9ca24; padding: 8px 12px; border-radius: 10px; display: inline-block; font-size: 16px; font-weight: bold; margin: 8px 0; }
-  .paywall-content a { display: block; background: #25d366; color: white; padding: 12px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 14px; margin-top: 15px; }
-  .paywall-content button { background: rgba(255,255,255,0.15); color: #fff; border: none; padding: 8px 16px; border-radius: 10px; margin-top: 10px; cursor: pointer; font-size: 13px; }
-
-  .footer-cr { font-size: 10px; color: #718093; text-align: center; margin-top: 20px; }
+:root{--p:#3478d4;--s:#f3a712;--bg:#f3f7fc;--fg:#203047;--card:#fff;--ok:#16864b;--bad:#c73535}
+[data-theme="dark"]{--bg:#141923;--fg:#f0f3f8;--card:#242d3b;--p:#5c9ce6}
+*{box-sizing:border-box}
+body{margin:0;font-family:Tahoma,Arial,sans-serif;background:var(--bg);color:var(--fg);min-height:100vh}
+button{font:inherit;cursor:pointer;touch-action:manipulation}
+.screen{display:none;min-height:100vh;padding:18px;max-width:760px;margin:auto}
+.screen.active{display:block}
+#screen-home.active{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.cover{width:150px;height:150px;border:5px solid var(--s);border-radius:50%;margin-bottom:20px;background:white}
+.btn{border:0;border-radius:14px;background:var(--p);color:white;padding:12px 18px;font-weight:bold}
+.btn.secondary{background:var(--s);color:#222}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.wide{width:100%;max-width:320px;margin:8px auto;display:block}
+.header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.card,.choice,.question{background:var(--card);color:var(--fg);border-radius:16px;padding:18px;text-align:center;border:2px solid transparent;box-shadow:0 3px 10px #00000012}
+.card{font-size:19px;min-height:115px}
+.card .emoji{font-size:38px;display:block;margin-bottom:10px}
+.question{font-size:clamp(28px,7vw,55px);margin:18px 0;overflow-wrap:anywhere}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.choice{font-size:34px;min-width:0}
+.choice.correct{border-color:var(--ok);background:#16864b20}
+.choice.wrong{border-color:var(--bad);background:#c7353520}
+.choice:disabled{opacity:.65}
+.note{text-align:center;min-height:32px;margin:15px 0;font-weight:bold}
+.good{color:var(--ok)}.bad{color:var(--bad)}
+.small{font-size:14px;opacity:.8;text-align:center}
+[hidden]{display:none!important}
+@media(max-width:380px){.screen{padding:12px}.card,.choice{padding:12px}.grid{gap:9px}}
 </style>
 </head>
 <body>
+<section class="screen active" id="screen-home">
+<svg class="cover" viewBox="0 0 100 100" role="img" aria-label="Celia">
+ <circle cx="50" cy="50" r="49" fill="#fce4ec"/>
+ <path d="M23 42 Q17 10 43 24 Q60 5 78 36 L72 61 L28 61Z" fill="#795548"/>
+ <ellipse cx="50" cy="47" rx="25" ry="28" fill="#ffcc80"/>
+ <circle cx="41" cy="44" r="2.5"/><circle cx="59" cy="44" r="2.5"/>
+ <path d="M43 56 Q50 62 57 56" fill="none" stroke="#5d4037" stroke-width="2"/>
+ <path d="M15 100 Q50 67 85 100" fill="#4a90e2"/>
+</svg>
+<h1 data-ar="عالم سيليا للأطفال" data-en="Celia World Kids">عالم سيليا للأطفال</h1>
+<p data-ar="نتعلم ونلعب ونكسب النجوم!" data-en="Learn, play and earn stars!">نتعلم ونلعب ونكسب النجوم!</p>
+<button class="btn wide" id="startBtn">ابدأ الآن 🚀</button>
+<button class="btn secondary wide" id="langBtn">English</button>
+<button class="btn wide" id="themeBtn">🌙 الوضع الداكن</button>
+</section>
 
-<div class="container">
-  <div class="card">
-    <div class="top-bar">
-      <button class="lang-btn" onclick="toggleLang()">🌐 <span id="langLbl">English</span></button>
-      <span style="font-size: 12px; color: #a4b0be; font-weight: bold;">Celia World 2026</span>
-    </div>
+<section class="screen" id="screen-games">
+ <div class="header">
+  <button class="btn" id="homeBtn">الرئيسية</button>
+  <h2 data-ar="اختر لعبة" data-en="Choose a game">اختر لعبة</h2>
+  <span id="menuStars">⭐ 0</span>
+ </div>
+ <div class="grid" id="gamesGrid"></div>
+</section>
 
-    <!-- الشاشة الرئيسية -->
-    <div id="homeScreen">
-      <div style="font-size: 50px; text-align: center; margin-bottom: 10px;">🧸 🌟 🧸</div>
-      <h1 id="mTitle">عالم سيليا الذكي</h1>
-      <p class="sub" id="mSub">تطبيق تعليمي تفاعلي آمن وممتع للأطفال</p>
-      
-      <button class="primary-btn" onclick="initGame()" id="startBtn">ابدأ اللعب والتعلم 🚀</button>
-      <div class="footer-cr">حقوق الملكية © سيليا احمد محمد زكى</div>
-    </div>
-
-    <!-- شاشة اللعب -->
-    <div id="gameScreen" style="display: none;">
-      <div class="game-header">
-        <button class="back-btn" onclick="goHome()" id="backBtn">← القائمة</button>
-        <span style="color: #f9ca24; font-weight: bold; font-size: 14px;" id="gameTitle">🔤 حروف وصور</span>
-        <span class="score-box">⭐ <span id="scoreVal">0</span></span>
-      </div>
-
-      <div class="progress-track">
-        <div class="progress-bar" id="progressBar"></div>
-      </div>
-
-      <div class="question-box">
-        <div class="emoji-display" id="emojiDisp">🦁</div>
-        <div class="prompt-text" id="promptDisp">اختر الصورة الصحيحة:</div>
-      </div>
-
-      <!-- 4 اختيارات -->
-      <div class="choices-grid" id="choicesGrid"></div>
-      <div class="feedback-msg" id="feedbackMsg"></div>
-    </div>
-  </div>
-</div>
-
-<!-- نافذة قفل النسخة التجريبية (Paywall) -->
-<div id="paywallModal">
-  <div class="paywall-content">
-    <h2 id="pwH2">انتهت المحاولات المجانية! 🌟</h2>
-    <p id="pwP">لفتح النسخة الكاملة ومدى الحياة لطفلك بـ <b>49 جنيهاً فقط!</b> حول عبر إنستاباي على العنوان التالي:</p>
-    <code>mhmedzaki@instapay</code>
-    <a id="waBtn" href="#" target="_blank">💬 أرسل إيصال التحويل على واتساب للتفعيل</a>
-    <button onclick="closePaywall()" id="pwClose">إغلاق</button>
-  </div>
-</div>
+<section class="screen" id="screen-play">
+ <div class="header">
+  <button class="btn" id="exitBtn">خروج</button>
+  <strong id="scoreDisplay">⭐ النجوم: 0</strong>
+ </div>
+ <div id="gameContent"></div>
+ <p class="small" data-ar="النجوم محفوظة على هذا الجهاز فقط." data-en="Stars are saved on this device only.">النجوم محفوظة على هذا الجهاز فقط.</p>
+</section>
 
 <script>
-// إعدادات اللغات
-let lang = 'ar';
-const i18n = {
-  ar: {
-    langLbl: "English",
-    mTitle: "عالم سيليا الذكي",
-    mSub: "تطبيق تعليمي تفاعلي آمن وممتع للأطفال",
-    startBtn: "ابدأ اللعب والتعلم 🚀",
-    backBtn: "← القائمة",
-    gameTitle: "🔤 حروف وصور",
-    promptText: "اختر الكلمة أو الصورة الصحيحة:",
-    good: "🎉 ممتازة! إجابة صحيحة",
-    try: "❌ حاولي مرة أخرى يا بطلة",
-    pwH2: "انتهت المحاولات المجانية! 🌟",
-    pwP: "لفتح النسخة الكاملة ومدى الحياة لطفلك بـ <b>49 جنيهاً فقط!</b> حول عبر إنستاباي على:",
-    waText: "💬 أرسل إيصال التحويل على واتساب للتفعيل",
-    close: "إغلاق"
-  },
-  en: {
-    langLbl: "عربي",
-    mTitle: "Celia Smart World",
-    mSub: "Safe and interactive learning app for kids",
-    startBtn: "Start Playing & Learning 🚀",
-    backBtn: "← Menu",
-    gameTitle: "🔤 Letters & Pictures",
-    promptText: "Choose the correct picture:",
-    good: "🎉 Well done! Correct",
-    try: "❌ Try again!",
-    pwH2: "Free Trials Ended! 🌟",
-    pwP: "Unlock the full lifetime version for <b>49 EGP only!</b> Transfer via InstaPay to:",
-    waText: "💬 Send transfer receipt on WhatsApp to activate",
-    close: "Close"
-  }
+"use strict";
+
+const $ = id => document.getElementById(id);
+const T = {
+ ar:{start:"ابدأ الآن 🚀",home:"الرئيسية",exit:"خروج",stars:"النجوم: ",
+ match:"المطابقة",memory:"الذاكرة",counting:"العد",choose:"اختر لعبة",
+ target:"اختر الشكل المطابق",apples:"كم عدد التفاحات؟",retry:"حاول مرة أخرى",
+ correct:"أحسنت! إجابة صحيحة 🎉",finished:"أحسنت! أكملت اللعبة 🎉",
+ memoryHelp:"اعثر على الأزواج المتشابهة",countDone:"انتهت الجولات العشر!",
+ themeDark:"🌙 الوضع الداكن",themeLight:"☀️ الوضع الفاتح",
+ homeTitle:"عالم سيليا للأطفال",intro:"نتعلم ونلعب ونكسب النجوم!"},
+ en:{start:"Start Now 🚀",home:"Home",exit:"Exit",stars:"Stars: ",
+ match:"Match",memory:"Memory",counting:"Counting",choose:"Choose a game",
+ target:"Find the matching symbol",apples:"How many apples?",
+ retry:"Try again",correct:"Well done! Correct answer 🎉",
+ finished:"Great job! Game completed 🎉",memoryHelp:"Find matching pairs",
+ countDone:"All 10 rounds completed!",themeDark:"🌙 Dark mode",
+ themeLight:"☀️ Light mode",homeTitle:"Celia World Kids",
+ intro:"Learn, play and earn stars!"}
 };
-
-function toggleLang() {
-  lang = lang === 'ar' ? 'en' : 'ar';
-  document.getElementById('appRoot').lang = lang;
-  document.getElementById('appRoot').dir = lang === 'ar' ? 'rtl' : 'ltr';
-  
-  const t = i18n[lang];
-  document.getElementById('langLbl').textContent = t.langLbl;
-  document.getElementById('mTitle').textContent = t.mTitle;
-  document.getElementById('mSub').textContent = t.mSub;
-  document.getElementById('startBtn').textContent = t.startBtn;
-  document.getElementById('backBtn').textContent = t.backBtn;
-  document.getElementById('gameTitle').textContent = t.gameTitle;
-  document.getElementById('pwH2').textContent = t.pwH2;
-  document.getElementById('pwP').innerHTML = t.pwP;
-  document.getElementById('waBtn').textContent = t.waText;
-  document.getElementById('pwClose').textContent = t.close;
-}
-
-// واتساب والدفع
-const WHATSAPP_NUM = "201000000000"; // استبدل برقمك الصحيح
-document.getElementById('waBtn').href = `https://wa.me/${WHATSAPP_NUM}?text=` + encodeURIComponent("مرحباً، أود تفعيل النسخة الكاملة لتطبيق Celia World Kids 2026 بقيمة 49 جنيه، وهذا إيصال التحويل عبر انستاباي");
-
-// بيانات الأسئلة بـ 4 اختيارات
-const QUESTIONS = [
-  { letter: 'أ', word: 'أسد', emoji: '🦁', choices: ['🦁', '🐱', '🐶', '🐰'], correct: '🦁' },
-  { letter: 'ب', word: 'بطة', emoji: '🦆', choices: ['🐦', '🦆', '🐔', '🐧'], correct: '🦆' },
-  { letter: 'ت', word: 'تفاحة', emoji: '🍎', choices: ['🍌', '🍇', '🍎', '🍊'], correct: '🍎' },
-  { letter: 'ج', word: 'جمل', emoji: '🐪', choices: ['🐪', '🐘', '🦒', '🐎'], correct: '🐪' },
-  { letter: 'ح', word: 'حصان', emoji: '🐴', choices: ['🐮', '🐴', '🐑', '🐐'], correct: '🐴' },
-  { letter: 'س', word: 'سمكة', emoji: '🐟', choices: ['🐙', '🐟', '🦈', '🐬'], correct: '🐟' }
+let lang="ar", activeGame=null;
+let progress={totalStars:0};
+let state={};
+const games=[
+ {id:"match",icon:"🎯"},
+ {id:"memory",icon:"🧠"},
+ {id:"counting",icon:"🔢"}
 ];
 
-// قفل النسخة التجريبية (Guardrail)
-let plays = localStorage.getItem('csaw_plays') ? parseInt(localStorage.getItem('csaw_plays')) : 0;
-const FREE_LIMIT = 2;
+function loadProgress(){
+ try{
+  const p=JSON.parse(localStorage.getItem("celia_kids_final")||"{}");
+  if(Number.isSafeInteger(p.totalStars)&&p.totalStars>=0)
+   progress.totalStars=p.totalStars;
+ }catch(e){progress.totalStars=0;}
+}
+function saveProgress(){
+ try{localStorage.setItem("celia_kids_final",JSON.stringify(progress));}
+ catch(e){console.warn("تعذر حفظ التقدم على هذا الجهاز.");}
+}
+function awardStar(){
+ if(!Number.isSafeInteger(progress.totalStars))progress.totalStars=0;
+ progress.totalStars++;
+ saveProgress();
+ updateStars();
+}
+function updateStars(){
+ $("scoreDisplay").textContent=T[lang].stars+progress.totalStars;
+ $("menuStars").textContent="⭐ "+progress.totalStars;
+}
+function showScreen(id){
+ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+ $(id).classList.add("active");
+}
+function applyLanguage(){
+ document.documentElement.lang=lang;
+ document.documentElement.dir=lang==="ar"?"rtl":"ltr";
+ document.querySelectorAll("[data-ar][data-en]").forEach(el=>{
+  el.textContent=el.dataset[lang];
+ });
+ $("startBtn").textContent=T[lang].start;
+ $("langBtn").textContent=lang==="ar"?"English":"العربية";
+ $("homeBtn").textContent=T[lang].home;
+ $("exitBtn").textContent=T[lang].exit;
+ $("themeBtn").textContent=document.documentElement.dataset.theme==="dark"
+  ?T[lang].themeLight:T[lang].themeDark;
+ updateStars();
+ renderGamesMenu();
+ // تحديث نصوص اللعبة الحالية دون إعادة تشغيلها أو فقد تقدمها.
+ if(activeGame==="match"||activeGame==="counting") renderCurrentQuestionLanguage();
+ if(activeGame==="memory"){
+  const help=$("memoryHelp");
+  if(help)help.textContent=T[lang].memoryHelp;
+ }
+}
+function renderCurrentQuestionLanguage(){
+ const title=$("questionTitle");
+ if(title)title.textContent=activeGame==="match"?T[lang].target:T[lang].apples;
+ const status=$("gameStatus");
+ if(status&&status.dataset.msg==="retry")status.textContent=T[lang].retry;
+ if(status&&status.dataset.msg==="correct")status.textContent=T[lang].correct;
+ if(status&&status.dataset.msg==="finished")status.textContent=T[lang].countDone;
+}
+function renderGamesMenu(){
+ const grid=$("gamesGrid");
+ if(!grid)return;
+ grid.replaceChildren();
+ games.forEach(g=>{
+  const b=document.createElement("button");
+  b.className="card";
+  const icon=document.createElement("span");
+  icon.className="emoji";icon.textContent=g.icon;
+  const name=document.createElement("span");
+  name.textContent=T[lang][g.id];
+  b.append(icon,name);
+  b.addEventListener("click",()=>openGame(g.id));
+  grid.appendChild(b);
+ });
+}
+function startApp(){renderGamesMenu();showScreen("screen-games");}
+function goHome(){activeGame=null;showScreen("screen-home");}
+function closeGame(){activeGame=null;renderGamesMenu();showScreen("screen-games");}
+function openGame(id){
+ activeGame=id;
+ state={answered:false};
+ if(id==="counting")state.countRound=1;
+ showScreen("screen-play");
+ updateStars();
+ if(id==="match")startMatchGame();
+ if(id==="memory")startMemoryGame();
+ if(id==="counting")startCountingGame();
+}
 
-function checkTrial() {
-  const unlocked = localStorage.getItem('csaw_unlocked') === 'true';
-  if (unlocked) return true;
+function statusNode(){
+ const p=document.createElement("p");
+ p.className="note";p.id="gameStatus";p.setAttribute("aria-live","polite");
+ return p;
+}
+function makeQuestion(text){
+ const d=document.createElement("div");
+ d.className="question";d.textContent=text;return d;
+}
+function makeChoice(text,onClick){
+ const b=document.createElement("button");
+ b.className="choice";b.type="button";b.textContent=text;
+ b.addEventListener("click",()=>onClick(b));
+ return b;
+}
 
-  if (plays >= FREE_LIMIT) {
-    document.getElementById('paywallModal').style.display = 'flex';
-    return false;
+// لعبة المطابقة: الإجابة الخاطئة تسمح بالمحاولة، والصحيحة تحتسب مرة واحدة.
+function startMatchGame(){
+ state.answered=false;
+ const all=["🦁","🐶","🍎","🚗","🐱","🍌","✈️","🐸"];
+ const target=all[Math.floor(Math.random()*4)];
+ const opts=[target,...all.filter(x=>x!==target).sort(()=>Math.random()-.5).slice(0,3)]
+  .sort(()=>Math.random()-.5);
+ const root=$("gameContent");root.replaceChildren();
+ const title=document.createElement("h2");title.id="questionTitle";
+ title.textContent=T[lang].target;root.appendChild(title);
+ root.appendChild(makeQuestion(target));
+ const choices=document.createElement("div");choices.className="choices";
+ const status=statusNode();root.appendChild(choices);root.appendChild(status);
+ opts.forEach(opt=>choices.appendChild(makeChoice(opt,button=>{
+  if(state.answered)return;
+  if(opt!==target){
+   button.classList.add("wrong");button.disabled=true;
+   status.textContent=T[lang].retry;status.dataset.msg="retry";
+   return;
   }
-  plays++;
-  localStorage.setItem('csaw_plays', plays);
-  return true;
+  state.answered=true;button.classList.add("correct");awardStar();
+  choices.querySelectorAll("button").forEach(b=>b.disabled=true);
+  status.textContent=T[lang].correct;status.dataset.msg="correct";
+  setTimeout(()=>{if(activeGame==="match")startMatchGame();},900);
+ })));
 }
 
-function closePaywall() {
-  document.getElementById('paywallModal').style.display = 'none';
-}
-
-// محرك النطق الصوتي
-function speak(text) {
-  if (!('speechSynthesis' in window)) return;
-  window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = lang === 'ar' ? 'ar-EG' : 'en-US';
-  u.rate = 0.9;
-  window.speechSynthesis.speak(u);
-}
-
-// إدارة اللعبة
-let qIndex = 0;
-let score = 0;
-let answeredLocked = false;
-
-function initGame() {
-  if (!checkTrial()) return;
-  qIndex = 0;
-  score = 0;
-  document.getElementById('homeScreen').style.display = 'none';
-  document.getElementById('gameScreen').style.display = 'block';
-  document.getElementById('scoreVal').textContent = score;
-  loadQ();
-}
-
-function goHome() {
-  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-  document.getElementById('gameScreen').style.display = 'none';
-  document.getElementById('homeScreen').style.display = 'block';
-}
-
-function loadQ() {
-  answeredLocked = false;
-  if (qIndex >= QUESTIONS.length) qIndex = 0;
-  
-  const q = QUESTIONS[qIndex];
-  document.getElementById('emojiDisp').textContent = q.emoji;
-  
-  const t = i18n[lang];
-  document.getElementById('promptDisp').textContent = `${t.promptText} (${q.letter} - ${q.word})`;
-  document.getElementById('feedbackMsg').textContent = '';
-
-  const progress = ((qIndex + 1) / QUESTIONS.length) * 100;
-  document.getElementById('progressBar').style.width = progress + '%';
-
-  const grid = document.getElementById('choicesGrid');
-  grid.innerHTML = '';
-
-  // خلط الاختيارات عشوائياً
-  const randomizedChoices = [...q.choices].sort(() => Math.random() - 0.5);
-
-  randomizedChoices.forEach(item => {
-    const btn = document.createElement('div');
-    btn.className = 'choice-card';
-    btn.textContent = item;
-    btn.onclick = () => verifyAnswer(item === q.correct, btn);
-    grid.appendChild(btn);
+// لعبة الذاكرة: كل زوج يحتسب مرة، والقفل يمنع النقر أثناء كشف الزوج.
+function startMemoryGame(){
+ const emojis=["🐶","🐱","🐭","🐹"];
+ const cards=[...emojis,...emojis].sort(()=>Math.random()-.5);
+ let flipped=[],locked=false,matches=0;
+ const root=$("gameContent");root.replaceChildren();
+ const help=document.createElement("h2");help.id="memoryHelp";
+ help.textContent=T[lang].memoryHelp;root.appendChild(help);
+ const board=document.createElement("div");
+ board.className="choices";board.style.gridTemplateColumns="repeat(4,minmax(0,1fr))";
+ root.appendChild(board);
+ const status=statusNode();root.appendChild(status);
+ cards.forEach((emoji,index)=>{
+  const b=makeChoice("❓",button=>{
+   if(locked||button.dataset.matched==="true"||flipped.includes(button))return;
+   button.textContent=emoji;flipped.push(button);
+   if(flipped.length!==2)return;
+   locked=true;
+   const [a,c]=flipped;
+   if(a.textContent===c.textContent){
+    [a,c].forEach(card=>{
+     card.dataset.matched="true";card.classList.add("correct");card.disabled=true;
+    });
+    matches++;awardStar();flipped=[];locked=false;
+    if(matches===emojis.length){
+     status.textContent=T[lang].finished;status.dataset.msg="finished";
+    }
+   }else{
+    setTimeout(()=>{
+     [a,c].forEach(card=>{card.textContent="❓";});
+     flipped=[];locked=false;
+    },850);
+   }
   });
+  b.id="mem-"+index;b.style.fontSize="30px";b.style.padding="12px 2px";
+  board.appendChild(b);
+ });
 }
 
-function verifyAnswer(isRight, el) {
-  if (answeredLocked) return;
-  const t = i18n[lang];
-  const fb = document.getElementById('feedbackMsg');
-
-  if (isRight) {
-    answeredLocked = true; // منع تكرار النجوم لنفس السؤال
-    el.classList.add('correct');
-    score++;
-    document.getElementById('scoreVal').textContent = score;
-    fb.style.color = '#2ed573';
-    fb.textContent = t.good;
-    speak(t.good);
-
-    setTimeout(() => {
-      qIndex++;
-      loadQ();
-    }, 1200);
-  } else {
-    el.classList.add('wrong');
-    fb.style.color = '#eb4d4b';
-    fb.textContent = t.try;
-    speak(t.try);
-
-    setTimeout(() => {
-      el.classList.remove('wrong');
-    }, 800);
-  }
+// لعبة العد: 10 جولات بالضبط؛ الجولة منفصلة عن إجمالي النجوم.
+function startCountingGame(){
+ if(state.countRound>10){
+  const root=$("gameContent");root.replaceChildren();
+  const done=document.createElement("h2");done.className="note good";
+  done.textContent=T[lang].countDone;root.appendChild(done);
+  const result=document.createElement("p");result.className="note";
+  result.textContent=T[lang].finished;root.appendChild(result);
+  return;
+ }
+ state.answered=false;
+ const n=state.countRound,root=$("gameContent");root.replaceChildren();
+ const title=document.createElement("h2");title.id="questionTitle";
+ title.textContent=T[lang].apples+" ("+n+"/10)";root.appendChild(title);
+ root.appendChild(makeQuestion("🍎".repeat(n)));
+ const choices=document.createElement("div");choices.className="choices";
+ const status=statusNode();root.appendChild(choices);root.appendChild(status);
+ let opts=new Set([n]);
+ while(opts.size<3){
+  const candidate=Math.max(1,Math.min(10,n+(Math.random()<.5?-1:1)*(1+Math.floor(Math.random()*3))));
+  opts.add(candidate);
+ }
+ [...opts].sort(()=>Math.random()-.5).forEach(value=>{
+  choices.appendChild(makeChoice(String(value),button=>{
+   if(state.answered)return;
+   if(value!==n){
+    button.classList.add("wrong");button.disabled=true;
+    status.textContent=T[lang].retry;status.dataset.msg="retry";return;
+   }
+   state.answered=true;button.classList.add("correct");
+   choices.querySelectorAll("button").forEach(b=>b.disabled=true);
+   awardStar();status.textContent=T[lang].correct;status.dataset.msg="correct";
+   setTimeout(()=>{
+    if(activeGame!=="counting")return;
+    state.countRound++;startCountingGame();
+   },650);
+  }));
+ });
 }
+
+$("startBtn").addEventListener("click",startApp);
+$("homeBtn").addEventListener("click",goHome);
+$("exitBtn").addEventListener("click",closeGame);
+$("langBtn").addEventListener("click",()=>{
+ lang=lang==="ar"?"en":"ar";applyLanguage();
+});
+$("themeBtn").addEventListener("click",()=>{
+ const el=document.documentElement;
+ el.dataset.theme=el.dataset.theme==="dark"?"light":"dark";
+ applyLanguage();
+});
+
+loadProgress();
+applyLanguage();
 </script>
 </body>
 </html>
