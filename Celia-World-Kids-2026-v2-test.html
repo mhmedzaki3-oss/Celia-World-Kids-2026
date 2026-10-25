@@ -1,0 +1,470 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#6755df">
+<title>Celia World Kids 2026 | عالم سيليا للأطفال</title>
+<style>
+:root{--bg:#f5f7ff;--card:#fff;--txt:#25234a;--p:#6755df;--pink:#ff70b7;--yellow:#ffcf55;--green:#20b98a;--shadow:0 5px 20px #38306a14}
+body.dark{--bg:#19192c;--card:#282841;--txt:#f5f4ff;--shadow:0 5px 20px #0003}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:Arial,Tahoma,sans-serif;transition:background .2s}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0;border-radius:13px;padding:11px 14px;font-weight:bold}
+button:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+button:disabled{opacity:.55;cursor:not-allowed}
+header{background:linear-gradient(120deg,#6555dc,#ad6de9,#ff82b8);color:white;padding:22px 14px;text-align:center}
+header h1{margin:0 0 8px;font-size:clamp(24px,5vw,36px)}
+main{max-width:1100px;margin:auto;padding:15px}
+.toolbar,.row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0}
+.toolbar button{background:#fff;color:#43339e}
+.panel,.tile{background:var(--card);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+.stats{display:flex;justify-content:space-around;gap:10px;margin:15px 0;flex-wrap:wrap}
+.stat{background:var(--card);padding:12px 18px;border-radius:15px;text-align:center;min-width:100px}
+.stat strong{display:block;font-size:24px;color:var(--p)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}
+.tile{text-align:center;border:2px solid transparent;cursor:pointer;color:var(--txt)}
+.tile:hover{border-color:var(--p)}
+.emoji{font-size:42px;display:block;margin-bottom:8px}
+.hidden{display:none!important}
+.primary{background:var(--p);color:white}
+.secondary{background:#ffe2f1;color:#87245d}
+.answer{background:#eeeaff;color:#342581;font-size:18px;min-height:54px}
+body.dark .answer{background:#454166;color:white}
+.answers{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:9px;margin:16px 0}
+.big{font-size:clamp(28px,7vw,54px);text-align:center;margin:20px 0;overflow-wrap:anywhere}
+.good{color:var(--green);font-weight:bold;font-size:19px}
+.bad{color:#e45476;font-weight:bold;font-size:18px}
+.story,.discovery{padding:12px;margin:10px 0;border-radius:14px;background:var(--bg)}
+.story p,.discovery p{line-height:1.8}
+footer{text-align:center;padding:25px;opacity:.75}
+canvas{display:block;width:100%;max-width:600px;height:300px;border:2px dashed var(--p);border-radius:15px;touch-action:none;background:white;margin:15px auto}
+input[type=color]{width:48px;height:40px}
+input[type=text]{width:100%;padding:12px;border:1px solid #aaa;border-radius:10px;margin:8px 0}
+.progress{height:9px;border-radius:8px;background:#ddd;overflow:hidden;margin:12px 0}
+.progress span{display:block;height:100%;background:var(--green);width:0}
+details summary{cursor:pointer;font-weight:bold}
+.small{font-size:13px;opacity:.8}
+footer a{color:inherit}
+</style>
+</head>
+<body>
+<header>
+<h1>🌈 Celia World Kids 2026</h1>
+<p>عالم سيليا للأطفال ٢٠٢٦</p>
+<p id="slogan">تعلّم • العب • اكتشف</p>
+<div class="toolbar">
+<button onclick="toggleLang()" id="langBtn">English</button>
+<button onclick="toggleTheme()" id="themeBtn">🌙 الوضع الليلي</button>
+<button onclick="toggleSound()" id="soundBtn">🔇 الصوت</button>
+<button onclick="speak(currentTitle())">🔊 اقرأ لي</button>
+</div>
+</header>
+
+<main>
+<div class="stats">
+<div class="stat">⭐ <strong id="stars">0</strong><span id="starsLabel">النجوم</span></div>
+<div class="stat">🎮 <strong id="played">0</strong><span id="playedLabel">الألعاب المكتملة</span></div>
+<div class="stat">🌟 <strong id="level">1</strong><span id="levelLabel">المستوى</span></div>
+</div>
+
+<section id="home">
+<div class="panel">
+<h2 id="welcome">أهلًا يا بطل! هيا نتعلم ونلعب 🎉</h2>
+<p id="intro">اختر لعبة، وأجب عن الأسئلة لتجمع النجوم.</p>
+<p class="small" id="saveNotice">يُحفظ تقدمك على هذا الجهاز فقط.</p>
+</div>
+<h2 id="gamesHeading">🎮 الألعاب العشرة</h2>
+<div class="grid" id="games"></div>
+<h2 id="discoverHeading">🦁 عالم الاكتشاف</h2>
+<div class="grid" id="discover"></div>
+<h2 id="storiesHeading">📚 حكايات سيليا</h2>
+<div class="panel">
+<p id="storyIntro">عشرون حكاية قصيرة للتعلم والمرح.</p>
+<div id="stories"></div>
+</div>
+<h2 id="purchaseHeading">🛍️ شراء التطبيق</h2>
+<div class="panel">
+<p id="purchaseText">لشراء التطبيق أو الاستفسار عن التفعيل، تواصل مع البائع.</p>
+<p><a href="https://wa.me/201022918830?text=أرغب%20في%20شراء%20Celia%20World%20Kids%202026" target="_blank" rel="noopener noreferrer">WhatsApp: 01022918830</a></p>
+<p id="paymentNote">للدفع عبر InstaPay، اطلب بيانات الدفع من البائع. لا تُدخل بياناتك البنكية داخل التطبيق.</p>
+<p class="small">تنبيه: هذا الإصدار لا يتحقق من الدفع ولا يحتوي على نظام ترخيص تجاري آمن.</p>
+</div>
+</section>
+
+<section id="play" class="panel hidden">
+<div class="row"><button class="secondary" onclick="goHome()" id="backBtn">⬅ العودة</button></div>
+<h2 id="playTitle"></h2>
+<div class="progress"><span id="progressBar"></span></div>
+<div id="playContent"></div>
+<div id="feedback" aria-live="polite"></div>
+</section>
+</main>
+<footer>© 2026 Celia World Kids • Learn • Play • Explore</footer>
+
+<script>
+"use strict";
+
+/* نسخة تجريبية تعليمية.
+   لا تتضمن هذه الصفحة نظام DRM أو تفعيلًا تجاريًا آمنًا.
+   البيانات والتقدم محفوظان محليًا في المتصفح فقط.
+*/
+const STORE="celiaWorldKids2026_v2";
+const T={
+ar:{
+slogan:"تعلّم • العب • اكتشف",night:"🌙 الوضع الليلي",day:"☀️ الوضع النهاري",
+soundOn:"🔊 الصوت يعمل",soundOff:"🔇 الصوت",stars:"النجوم",
+played:"الألعاب المكتملة",level:"المستوى",
+welcome:"أهلًا يا بطل! هيا نتعلم ونلعب 🎉",
+intro:"اختر لعبة، وأجب عن الأسئلة لتجمع النجوم.",
+games:"🎮 الألعاب العشرة",discover:"🦁 عالم الاكتشاف",
+stories:"📚 حكايات سيليا",storyIntro:"عشرون حكاية قصيرة للتعلم والمرح.",
+back:"⬅ العودة",right:"صح! أحسنت يا بطل! ⭐",
+wrong:"إجابة غير صحيحة، حاول مرة أخرى 💪",
+done:"أحسنت! أكملت اللعبة! 🎉",next:"السؤال التالي",
+restart:"العب مرة أخرى",question:"اختر الإجابة الصحيحة:",
+match:"ابحث عن صورتين متطابقتين",maze:"ساعد الروبوت للوصول إلى النجمة",
+draw:"ارسم ولون بحرية",clear:"مسح الرسم",
+storyQ:"سؤال الحكاية:",answer:"أجب عن السؤال",
+speak:"استمع إلى الوصف",home:"الرئيسية",moves:"عدد الحركات",
+listen:"🔊 اقرأ الحكاية",progress:"التقدم محفوظ على هذا الجهاز"
+},
+en:{
+slogan:"Learn • Play • Explore",night:"🌙 Dark mode",day:"☀️ Light mode",
+soundOn:"🔊 Sound on",soundOff:"🔇 Sound off",stars:"Stars",
+played:"Games completed",level:"Level",
+welcome:"Welcome, little hero! Let's learn and play 🎉",
+intro:"Choose a game and answer questions to earn stars.",
+games:"🎮 Ten games",discover:"🦁 Discover the world",
+stories:"📚 Celia's stories",storyIntro:"Twenty short stories for learning and fun.",
+back:"⬅ Back",right:"Correct! Great job! ⭐",
+wrong:"Not quite. Try again! 💪",
+done:"Amazing! You completed the game! 🎉",next:"Next question",
+restart:"Play again",question:"Choose the correct answer:",
+match:"Find two matching pictures",maze:"Help the robot reach the star",
+draw:"Draw and color freely",clear:"Clear drawing",
+storyQ:"Story question:",answer:"Answer",
+speak:"Listen to the description",home:"Home",moves:"Moves",
+listen:"🔊 Read story",progress:"Progress is saved on this device"
+}
+};
+let lang="ar",soundOn=false,audioCtx=null;
+let state={stars:0,played:0,completed:[],storyRewards:[],drawings:{}};
+try{
+ const saved=JSON.parse(localStorage.getItem(STORE)||"{}");
+ state={...state,...saved};
+ if(!Array.isArray(state.completed))state.completed=[];
+ if(!Array.isArray(state.storyRewards))state.storyRewards=[];
+ if(!state.drawings||typeof state.drawings!=="object")state.drawings={};
+}catch(e){}
+const $=id=>document.getElementById(id);
+const tr=k=>T[lang][k]||k;
+const stories=[
+["النملة المجتهدة","The Busy Ant","كانت نملة تجمع الطعام كل يوم، وعندما جاء الشتاء وجدت ما يكفيها. الاجتهاد والتخطيط مهمان.","A little ant gathered food every day. When winter came, she had enough. Planning matters.","لماذا جمعت النملة الطعام؟","Why did the ant gather food?","للاستعداد للشتاء","To prepare for winter","للاستعداد للشتاء","To prepare for winter"],
+["الصديق الجديد","A New Friend","ساعدت قطة عصفورًا حزينًا، واكتشفا أن اللطف يصنع الصداقة.","A cat helped a sad bird. They discovered that kindness builds friendship.","ما الذي يصنع الصداقة؟","What builds friendship?","اللطف","Kindness","اللطف","Kindness"],
+["الشجرة الصغيرة","The Little Tree","سقى طفل شجرة كل يوم حتى كبرت. العناية الصغيرة تصنع فرقًا.","A child watered a tree until it grew. Small acts make a difference.","كيف ساعد الطفل الشجرة؟","How did the child help?","سقاها","He watered it","سقاها","He watered it"],
+["الكرة المفقودة","The Lost Ball","وجدت سلمى كرة وأعادتها لصاحبها. الأمانة تجعلنا موضع ثقة.","Salma found a ball and returned it. Honesty earns trust.","ماذا فعلت سلمى؟","What did Salma do?","أعادت الكرة","Returned the ball","أعادت الكرة","Returned the ball"],
+["الأرنب والصبر","The Patient Rabbit","تدرب الأرنب كل يوم حتى نجح في القفز فوق الحواجز.","A rabbit practiced every day until he could jump over hurdles.","كيف تعلم الأرنب؟","How did the rabbit learn?","بالتدريب","By practicing","بالتدريب","By practicing"],
+["قطرة الماء","A Drop of Water","أغلقت ليلى الصنبور أثناء تنظيف أسنانها. كل قطرة مهمة.","Leila turned off the tap while brushing her teeth. Every drop matters.","كيف وفرت ليلى الماء؟","How did Leila save water?","أغلقت الصنبور","Turned off the tap","أغلقت الصنبور","Turned off the tap"],
+["الهدية الجميلة","The Lovely Gift","صنع عمر بطاقة لجدته ففرحت لأنها هدية من القلب.","Omar made his grandmother a card. She loved the gift from the heart.","لماذا فرحت الجدة؟","Why was Grandma happy?","لأنها هدية من القلب","It came from the heart","لأنها هدية من القلب","It came from the heart"],
+["العصفور الشجاع","The Brave Bird","ساعد عصفور صديقه على العودة إلى عشه. الشجاعة فعل الصواب.","A bird helped his friend return to the nest. Courage means doing right.","ما معنى الشجاعة؟","What is courage?","فعل الصواب","Doing what is right","فعل الصواب","Doing what is right"],
+["المكتبة السحرية","The Magic Library","قرأت مريم عن النجوم والبحار واكتشفت متعة المعرفة.","Mariam read about stars and seas and discovered knowledge.","ماذا منحت الكتب مريم؟","What did books give Mariam?","المعرفة","Knowledge","المعرفة","Knowledge"],
+["يوم التعاون","Teamwork Day","نظف الأصدقاء الحديقة معًا وأنهوا العمل بسرعة.","Friends cleaned the garden together and finished quickly.","لماذا انتهوا بسرعة؟","Why did they finish quickly?","لأنهم تعاونوا","They worked together","لأنهم تعاونوا","They worked together"],
+["السلحفاة والزهرة","The Turtle and the Flower","حمت سلحفاة زهرة صغيرة حتى تفتحت وأصبحت الحديقة أجمل.","A turtle protected a flower until it bloomed.","ماذا حمت السلحفاة؟","What did the turtle protect?","زهرة","A flower","زهرة","A flower"],
+["الاعتذار","Saying Sorry","أخذ سامي لعبة أخته دون إذن، ثم اعتذر وأعادها.","Sami took his sister's toy, then apologized and returned it.","ماذا فعل سامي؟","What did Sami do?","اعتذر وأعاد اللعبة","Apologized and returned it","اعتذر وأعاد اللعبة","Apologized and returned it"],
+["الطائرة الورقية","The Kite","صنع طفل طائرة ورقية مع أبيه وتعلم الصبر والقياس.","A child built a kite with his father and learned patience.","مع من صنع الطفل الطائرة؟","Who helped make the kite?","أبيه","His father","أبيه","His father"],
+["السمكة النظيفة","The Clean Fish","جمعت سمكة وأصدقاؤها المخلفات للحفاظ على الماء نظيفًا.","A fish and her friends collected litter to keep the water clean.","كيف حافظوا على الماء؟","How did they help?","جمعوا المخلفات","They collected litter","جمعوا المخلفات","They collected litter"],
+["هدية الوقت","The Gift of Time","نظمت نور وقتها للعب والتعلم ومساعدة أسرتها.","Noor planned time for play, learning, and helping her family.","كيف نظمت نور يومها؟","How did Noor organize her day?","قسمت وقتها","Planned her time","قسمت وقتها","Planned her time"],
+["النجمة البعيدة","The Distant Star","راقب طفل النجوم مع معلمه وتعلم أن الأسئلة بداية الاكتشاف.","A child watched stars and learned that questions begin discovery.","ما بداية الاكتشاف؟","What begins discovery?","الأسئلة","Questions","الأسئلة","Questions"],
+["الخباز الصغير","The Little Baker","ساعدت هند أمها في إعداد الخبز وغسلت يديها قبل الطهي.","Hind helped bake bread and washed her hands first.","ماذا فعلت هند قبل الطهي؟","What did Hind do before cooking?","غسلت يديها","Washed her hands","غسلت يديها","Washed her hands"],
+["الكتاب المستعار","The Borrowed Book","حافظ يوسف على كتاب استعاره وأعاده في الموعد.","Youssef cared for a borrowed book and returned it on time.","ماذا فعل يوسف بالكتاب؟","What did Youssef do?","أعاده في الموعد","Returned it on time","أعاده في الموعد","Returned it on time"],
+["حديقة الفراشات","Butterfly Garden","زرع الأطفال أزهارًا فزارتها الفراشات. النباتات تساعد الكائنات الحية.","Children planted flowers that attracted butterflies. Plants help living things.","لماذا زرع الأطفال الأزهار؟","Why did children plant flowers?","لمساعدة الكائنات الحية","To help living things","لمساعدة الكائنات الحية","To help living things"],
+["صوت هادئ","A Gentle Voice","استمع صديقان لبعضهما وتحدثا بهدوء حتى حلا خلافهما.","Two friends listened and spoke calmly to solve a disagreement.","كيف حلا الخلاف؟","How did they solve it?","بالاستماع والهدوء","By listening calmly","بالاستماع والهدوء","By listening calmly"]
+];
+const games=[
+{id:"letters",icon:"🔤",ar:"الحروف والكلمات",en:"Letters & words"},
+{id:"count",icon:"🔢",ar:"عد الأشياء ١–١٠",en:"Count 1–10"},
+{id:"colors",icon:"🎨",ar:"الألوان والأشكال",en:"Colors & shapes"},
+{id:"memory",icon:"🧠",ar:"ذاكرة الحيوانات",en:"Animal memory"},
+{id:"puzzle",icon:"🧩",ar:"أحجية ترتيب الصورة",en:"Picture tile puzzle"},
+{id:"habitats",icon:"🌳",ar:"بيوت الحيوانات",en:"Animal habitats"},
+{id:"odd",icon:"🔎",ar:"اكتشف المختلف",en:"Odd one out"},
+{id:"maze",icon:"🤖",ar:"متاهة الروبوت",en:"Robot maze"},
+{id:"pattern",icon:"🔷",ar:"أكمل النمط",en:"Complete patterns"},
+{id:"draw",icon:"🖍️",ar:"الرسم والتلوين",en:"Drawing & coloring"}
+];
+const animals=[
+["🦁","الأسد","Lion","الأسد حيوان قوي يعيش في مجموعات.","Lions are strong animals that live in groups."],
+["🐘","الفيل","Elephant","للفيل خرطوم طويل يساعده في الشرب والتقاط الطعام.","An elephant uses its trunk to drink and pick up food."],
+["🐬","الدلفين","Dolphin","الدلافين ثدييات ذكية تعيش في الماء.","Dolphins are intelligent mammals that live in water."],
+["🦒","الزرافة","Giraffe","للزرافة رقبة طويلة تصل بها إلى أوراق الأشجار.","A giraffe uses its long neck to reach tree leaves."],
+["🐢","السلحفاة","Turtle","تحمل السلحفاة درعًا يحمي جسمها.","A turtle has a shell that protects its body."],
+["🦋","الفراشة","Butterfly","تتحول اليرقة إلى فراشة جميلة.","A caterpillar transforms into a butterfly."],
+["🐪","الجمل","Camel","يساعد الجمل الناس على التنقل في البيئات الصحراوية.","Camels help people travel in desert environments."],
+["🐧","البطريق","Penguin","طائر لا يطير ويجيد السباحة.","A flightless bird that swims well."]
+];
+const places=[
+["🏜️","الأهرامات","The Pyramids","بنى المصريون القدماء الأهرامات منذ آلاف السنين.","Ancient Egyptians built the pyramids thousands of years ago."],
+["🗿","أبو الهول","The Great Sphinx","تمثال قرب الجيزة له جسم أسد ورأس إنسان.","A statue near Giza with a lion's body and human head."],
+["🏛️","معبد الكرنك","Karnak Temple","مجموعة معابد تاريخية في الأقصر.","A historic temple complex in Luxor."],
+["🛕","معبد أبو سمبل","Abu Simbel","معبد أثري مشهور بتماثيله الضخمة في جنوب مصر.","An ancient temple famous for its giant statues in southern Egypt."],
+["🏺","المتحف المصري","The Egyptian Museum","يضم آثارًا تحكي قصص الحضارة المصرية القديمة.","It holds artifacts from ancient Egyptian civilization."]
+];
+
+function save(){try{localStorage.setItem(STORE,JSON.stringify(state))}catch(e){$("saveNotice").textContent="تعذر الحفظ المحلي. / Local save unavailable."}}
+function stats(){
+ $("stars").textContent=state.stars;$("played").textContent=state.played;
+ $("level").textContent=Math.floor(state.stars/5)+1
+}
+function speak(text){
+ if(!("speechSynthesis"in window)){alert("Speech synthesis is not supported in this browser.");return}
+ speechSynthesis.cancel();
+ const u=new SpeechSynthesisUtterance(String(text||""));
+ u.lang=lang==="ar"?"ar-EG":"en-US";u.rate=.9;speechSynthesis.speak(u)
+}
+function tone(ok){
+ if(!soundOn)return;
+ try{
+  audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==="suspended")audioCtx.resume();
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.connect(g);g.connect(audioCtx.destination);
+  o.frequency.value=ok?740:240;g.gain.value=.05;
+  o.start();o.stop(audioCtx.currentTime+.14)
+ }catch(e){}
+}
+function toggleSound(){soundOn=!soundOn;$("soundBtn").textContent=soundOn?tr("soundOn"):tr("soundOff");if(soundOn)tone(true)}
+function toggleTheme(){document.body.classList.toggle("dark");$("themeBtn").textContent=document.body.classList.contains("dark")?tr("day"):tr("night")}
+function toggleLang(){
+ lang=lang==="ar"?"en":"ar";
+ document.documentElement.lang=lang;
+ document.documentElement.dir=lang==="ar"?"rtl":"ltr";
+ render();
+}
+function currentTitle(){return $("playTitle").textContent||tr("welcome")}
+function goHome(){
+ $("play").classList.add("hidden");$("home").classList.remove("hidden");
+ $("feedback").textContent="";$("progressBar").style.width="0%";
+ if(window.speechSynthesis)speechSynthesis.cancel()
+}
+function openPlay(title){
+ $("home").classList.add("hidden");$("play").classList.remove("hidden");
+ $("playTitle").textContent=title;$("playContent").innerHTML="";
+ $("feedback").textContent="";$("progressBar").style.width="0%"
+}
+function message(ok){
+ $("feedback").innerHTML='<p class="'+(ok?"good":"bad")+'">'+tr(ok?"right":"wrong")+'</p>';
+ tone(ok)
+}
+function award(){
+ state.stars++;save();stats()
+}
+function progress(done,total){
+ $("progressBar").style.width=Math.min(100,Math.round(done/total*100))+"%"
+}
+function finish(id){
+ if(!state.completed.includes(id)){
+  state.completed.push(id);state.played++;state.stars+=2;save();stats()
+ }
+ $("progressBar").style.width="100%";
+ $("feedback").innerHTML='<p class="good">'+tr("done")+'</p>'+
+ '<button class="primary" onclick="goHome()">'+tr("home")+'</button> '+
+ '<button class="secondary" onclick="launch('+JSON.stringify(id)+')">'+tr("restart")+'</button>'
+}
+function render(){
+ $("slogan").textContent=tr("slogan");
+ $("themeBtn").textContent=document.body.classList.contains("dark")?tr("day"):tr("night");
+ $("soundBtn").textContent=soundOn?tr("soundOn"):tr("soundOff");
+ $("langBtn").textContent=lang==="ar"?"English":"العربية";
+ $("starsLabel").textContent=tr("stars");$("playedLabel").textContent=tr("played");$("levelLabel").textContent=tr("level");
+ $("welcome").textContent=tr("welcome");$("intro").textContent=tr("intro");
+ $("backBtn").textContent=tr("back");$("storyIntro").textContent=tr("storyIntro");
+ $("gamesHeading").textContent=tr("games");$("discoverHeading").textContent=tr("discover");
+ $("storiesHeading").textContent=tr("stories");$("saveNotice").textContent=tr("progress");
+ $("games").innerHTML=games.map(g=>`<button class="tile" onclick="launch('${g.id}')"><span class="emoji">${g.icon}</span><h3>${g[lang]}</h3><p>${lang==="ar"?"اضغط للعب":"Tap to play"}</p></button>`).join("");
+ $("discover").innerHTML=[...animals,...places].map((a,i)=>`<button class="tile" onclick="showDiscovery(${i})"><span class="emoji">${a[0]}</span><h3>${a[lang==="ar"?1:2]}</h3><p>${lang==="ar"?"اكتشف واستمع":"Discover & listen"}</p></button>`).join("");
+ $("stories").innerHTML=stories.map((s,i)=>`<details class="story"><summary>${i+1}. ${s[lang==="ar"?0:1]}</summary><p>${s[lang==="ar"?2:3]}</p><button class="secondary" onclick="speak(${JSON.stringify(s[lang==="ar"?2:3])})">${tr("listen")}</button> <button class="primary" onclick="storyQuestion(${i})">${tr("answer")}</button><div id="sq${i}"></div></details>`).join("");
+ stats()
+}
+function showDiscovery(i){
+ const all=[...animals,...places],a=all[i],x=lang==="ar"?1:2;
+ openPlay(a[x]);$("playContent").innerHTML=`<div class="big">${a[0]}</div><p>${a[x+2]}</p><button class="primary" onclick='speak(${JSON.stringify(a[x+2])})'>🔊 ${tr("speak")}</button>`
+}
+function storyQuestion(i){
+ const s=stories[i],ar=lang==="ar",el=$("sq"+i);
+ if(state.storyRewards.includes(i)){
+  el.innerHTML='<p class="good">'+tr("right")+'</p>';return
+ }
+ const correct=s[ar?8:9];
+ const wrongs=ar?
+ ["لأنه أراد النوم","لأنه لم يرَ الطعام","لأنه نسي اسمه"]:
+ ["To go to sleep","Because there was no food","Because he forgot his name"];
+ let wrong=wrongs[i%wrongs.length];
+ if(wrong===correct)wrong=wrongs[(i+1)%wrongs.length];
+ const choices=[correct,wrong].sort(()=>Math.random()-.5);
+ el.dataset.correct=correct;el.dataset.answered="false";
+ el.innerHTML=`<p><b>${s[ar?4:5]}</b></p><div class="answers">${choices.map((c,j)=>`<button class="answer" data-choice="${j}" onclick="storyCheck(${i},${j})">${c}</button>`).join("")}</div><div id="sf${i}" aria-live="polite"></div>`;
+ el._choices=choices
+}
+function storyCheck(i,j){
+ const el=$("sq"+i),out=$("sf"+i);
+ if(!el||!out||el.dataset.answered==="true")return;
+ const choice=el._choices[j],ok=choice===el.dataset.correct;
+ out.innerHTML='<p class="'+(ok?"good":"bad")+'">'+tr(ok?"right":"wrong")+'</p>';tone(ok);
+ if(ok){
+  el.dataset.answered="true";
+  el.querySelectorAll("button").forEach(b=>b.disabled=true);
+  if(!state.storyRewards.includes(i)){state.storyRewards.push(i);award();save()}
+ }
+}
+function launch(id){
+ const g=games.find(v=>v.id===id);if(!g)return;
+ openPlay(g[lang]);
+ if(id==="letters")quiz(id,[
+  {q:["ما الحرف الأول في كلمة أسد؟","Which letter begins the word Lion?"],a:["أ","L"],o:[["ب","B"],["س","Z"]]},
+  {q:["ما الحرف الأول في كلمة بطة؟","Which letter begins the word Duck?"],a:["ب","D"],o:[["ت","M"],["م","Z"]]},
+  {q:["ما الحرف الأول في كلمة قطة؟","Which letter begins the word Cat?"],a:["ق","C"],o:[["س","B"],["م","A"]]},
+  {q:["ما الحرف الأول في كلمة سمكة؟","Which letter begins the word Fish?"],a:["س","F"],o:[["ق","B"],["ب","A"]]},
+  {q:["ما الحرف الأول في كلمة موز؟","Which letter begins the word Banana?"],a:["م","B"],o:[["أ","S"],["س","C"]]}
+ ]);
+ else if(id==="count")countGame();
+ else if(id==="colors")quiz(id,[
+  {q:["اختر اللون الأحمر","Choose red"],a:["🔴","🔴"],o:[["🔵","🟡"],["🟢","🟣"]]},
+  {q:["اختر اللون الأزرق","Choose blue"],a:["🔵","🔵"],o:[["🔴","🟡"],["🟢","🟣"]]},
+  {q:["اختر الشكل الدائري","Choose a circle"],a:["⚪","⚪"],o:[["🟦","🔺"],["⬛","⭐"]]},
+  {q:["اختر الشكل المربع","Choose a square"],a:["🟦","🟦"],o:[["⚪","🔺"],["⭐","❤️"]]}
+ ]);
+ else if(id==="memory")memoryGame();
+ else if(id==="puzzle")puzzleGame();
+ else if(id==="habitats")quiz(id,[
+  {q:["أين تعيش السمكة؟","Where does a fish live?"],a:["البحر","Sea"],o:[["الصحراء","Desert"],["المدرسة","School"]]},
+  {q:["أين يعيش الجمل؟","Where does a camel live?"],a:["الصحراء","Desert"],o:[["البحر","Sea"],["الجليد","Ice"]]},
+  {q:["أين يعيش الدب القطبي؟","Where does a polar bear live?"],a:["الجليد","Ice"],o:[["الغابة","Forest"],["الصحراء","Desert"]]},
+  {q:["أين يعيش القرد غالبًا؟","Where does a monkey often live?"],a:["الغابة","Forest"],o:[["البحر","Sea"],["الجليد","Ice"]]}
+ ]);
+ else if(id==="odd")quiz(id,[
+  {q:["اختر المختلف","Find the odd one out"],a:["🚗","🚗"],o:[["🐱","🐱"],["🐶","🐶"]]},
+  {q:["اختر المختلف","Find the odd one out"],a:["🍎","🍎"],o:[["🚲","🚲"],["🚗","🚗"]]},
+  {q:["اختر المختلف","Find the odd one out"],a:["🐟","🐟"],o:[["🌳","🌳"],["🌷","🌷"]]}
+ ]);
+ else if(id==="maze")mazeGame();
+ else if(id==="pattern")quiz(id,[
+  {q:["🔴 🔵 🔴 ؟","🔴 🔵 🔴 ?"],a:["🔵","🔵"],o:[["🟢","🟢"],["🟡","🟡"]]},
+  {q:["⭐ 🌙 ⭐ ؟","⭐ 🌙 ⭐ ?"],a:["🌙","🌙"],o:[["☀️","☀️"],["⭐","⭐"]]},
+  {q:["🐱 🐶 🐱 ؟","🐱 🐶 🐱 ?"],a:["🐶","🐶"],o:[["🐰","🐰"],["🐱","🐱"]]}
+ ]);
+ else if(id==="draw")drawGame()
+}
+function quiz(id,items){
+ let i=0;
+ function show(){
+  if(i>=items.length){finish(id);return}
+  progress(i,items.length);
+  const item=items[i],x=lang==="ar"?0:1,correct=item.a[x];
+  let opts=[correct,...item.o.map(o=>o[x])];
+  opts=opts.sort(()=>Math.random()-.5);
+  $("playContent").innerHTML=`<p>${tr("question")} (${i+1}/${items.length})</p><div class="big">${item.q[x]}</div><div class="answers">${opts.map((o,j)=>`<button class="answer" onclick="answerQuiz(this,${JSON.stringify(o)},${JSON.stringify(correct)})">${o}</button>`).join("")}</div>`;
+ }
+ window.answerQuiz=(btn,ans,correct)=>{
+  if(btn.disabled)return;
+  if(ans===correct){
+   $("playContent").querySelectorAll("button.answer").forEach(b=>b.disabled=true);
+   message(true);award();i++;progress(i,items.length);setTimeout(show,500)
+  }else{message(false);btn.disabled=true}
+ };
+ show()
+}
+function countGame(){
+ let n=1;
+ function show(){
+  if(n>10){finish("count");return}
+  progress(n-1,10);
+  let opts=[n,n===10?8:n+1,n===1?3:n-1].sort(()=>Math.random()-.5);
+  $("playContent").innerHTML=`<p>${tr("question")}</p><div class="big">${"🍎".repeat(n)}</div><div class="answers">${opts.map(c=>`<button class="answer" onclick="countPick(this,${c},${n})">${c}</button>`).join("")}</div><p>${n}/10</p>`
+ }
+ window.countPick=(btn,c,correct)=>{
+  if(c===correct){
+   $("playContent").querySelectorAll("button.answer").forEach(b=>b.disabled=true);
+   message(true);award();n++;progress(n-1,10);setTimeout(show,400)
+  }else{message(false);btn.disabled=true}
+ };show()
+}
+function memoryGame(){
+ const icons=["🐱","🐶","🐼","🦁","🐸","🐵"];
+ const deck=[...icons,...icons].sort(()=>Math.random()-.5);
+ let opened=[],matched=new Set(),locked=false;
+ function show(){
+  $("playContent").innerHTML=`<p>${tr("match")}</p><div class="grid">${deck.map((v,i)=>`<button class="answer" id="m${i}" aria-label="card ${i+1}" onclick="flip(${i})">❔</button>`).join("")}</div><p>${matched.size/2}/6</p>`
+ }
+ window.flip=i=>{
+  if(locked||matched.has(i)||opened.includes(i))return;
+  $("m"+i).textContent=deck[i];opened.push(i);
+  if(opened.length===2){
+   if(deck[opened[0]]===deck[opened[1]]){
+    opened.forEach(j=>matched.add(j));message(true);award();opened=[];
+    if(matched.size===deck.length)finish("memory");else show()
+   }else{
+    locked=true;tone(false);
+    setTimeout(()=>{opened.forEach(j=>{const el=$("m"+j);if(el)el.textContent="❔"});opened=[];locked=false},800)
+   }
+  }
+ };show()
+}
+/* أحجية ترتيب: رتّب الرموز لتكوين صورة بسيطة؛ القطعة الفارغة تتحرك فقط بجوارها. */
+function puzzleGame(){
+ const solved=["🐘","🌿","🌿","🌿","🐘","🌿","🌿","🌿","🏁"];
+ let board=solved.slice();
+ for(let k=0;k<50;k++){
+  const z=board.indexOf("🏁"),opts=[z-3,z+3,z-1,z+1].filter(n=>n>=0&&n<9&&!(Math.abs(n-z)===1&&Math.floor(n/3)!==Math.floor(z/3)));
+  const n=opts[Math.floor(Math.random()*opts.length)];
+  [board[z],board[n]]=[board[n],board[z]]
+ }
+ if(board.every((v,i)=>v===solved[i]))[board[0],board[1]]=[board[1],board[0]];
+ let moves=0;
+ function show(){
+  $("playContent").innerHTML=`<p>${lang==="ar"?"حرّك القطع لتجميع صورة الفيل. اضغط قطعة بجوار المربع الفارغ.":"Move tiles to assemble the elephant picture. Tap a tile next to the empty space."}</p><div class="grid" style="grid-template-columns:repeat(3,minmax(0,1fr));max-width:390px;margin:auto">${board.map((v,i)=>`<button class="answer" style="height:85px;font-size:28px" onclick="puzzleMove(${i})">${v==="🏁"?"⬜":v}</button>`).join("")}</div><p>${tr("moves")}: ${moves}</p><button class="secondary" onclick="launch('puzzle')">${tr("restart")}</button>`;
+  progress(board.filter((v,i)=>v===solved[i]).length,9)
+ }
+ window.puzzleMove=i=>{
+  const z=board.indexOf("🏁");
+  const adjacent=Math.abs(i-z)===3||(Math.abs(i-z)===1&&Math.floor(i/3)===Math.floor(z/3));
+  if(!adjacent)return;
+  [board[i],board[z]]=[board[z],board[i]];moves++;
+  if(board.every((v,j)=>v===solved[j])){show();finish("puzzle")}else show()
+ };show()
+}
+function mazeGame(){
+ /* خريطة ثابتة ذات مسار صالح: البداية 0، النهاية 24 */
+ let pos=0,steps=0;
+ const walls=new Set([2,7,11,13,17,22]);
+ function show(){
+  $("playContent").innerHTML=`<p>${tr("maze")}</p><div class="grid" style="grid-template-columns:repeat(5,minmax(0,1fr));gap:5px">${Array.from({length:25},(_,i)=>`<div class="tile" style="padding:10px 2px;font-size:24px">${i===pos?"🤖":i===24?"⭐":walls.has(i)?"🪨":"▫️"}</div>`).join("")}</div><p>${tr("moves")}: ${steps}</p><div class="row"><button class="primary" onclick="moveMaze(-5)">⬆</button><button class="primary" onclick="moveMaze(-1)">⬅</button><button class="primary" onclick="moveMaze(5)">⬇</button><button class="primary" onclick="moveMaze(1)">➡</button></div><button class="secondary" onclick="launch('maze')">${tr("restart")}</button>`
+ }
+ window.moveMaze=d=>{
+  const next=pos+d;
+  if(next<0||next>24||(d===1&&pos%5===4)||(d===-1&&pos%5===0)||walls.has(next))return;
+  pos=next;steps++;
+  if(pos===24)finish("maze");else show()
+ };show()
+}
+function drawGame(){
+ $("playContent").innerHTML=`<p>${tr("draw")}</p><div class="row"><label>🎨 <input id="pen" type="color" value="#ff70b7"></label><label>✏️ <input id="width" type="range" min="2" max="20" value="5"></label></div><canvas id="canvas" width="600" height="300"></canvas><div class="row"><button class="primary" onclick="saveDrawing()">${lang==="ar"?"حفظ الرسم":"Save drawing"}</button><button class="secondary" onclick="clearCanvas()">${tr("clear")}</button><button class="secondary" onclick="finish('draw')">${tr("done")}</button></div><p class="small">${lang==="ar"?"يُحفظ الرسم في مساحة التخزين المحلية للمتصفح.":"Drawing is stored in this browser's local storage."}</p>`;
+ const c=$("canvas"),ctx=c.getContext("2d");let drawing=false;
+ ctx.lineCap="round";
+ if(state.drawings.main){
+  const img=new Image();img.onload=()=>ctx.drawImage(img,0,0,c.width,c.height);img.src=state.drawings.main
+ }
+ function point(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height}}
+ c.onpointerdown=e=>{drawing=true;c.setPointerCapture(e.pointerId);const p=point(e);ctx.beginPath();ctx.moveTo(p.x,p.y)};
+ c.onpointermove=e=>{if(!drawing)return;const p=point(e);ctx.strokeStyle=$("pen").value;ctx.lineWidth=+$("width").value;ctx.lineTo(p.x,p.y);ctx.stroke()};
+ c.onpointerup=()=>drawing=false;c.onpointercancel=()=>drawing=false;
+ window.clearCanvas=()=>{ctx.clearRect(0,0,c.width,c.height);delete state.drawings.main;save()};
+ window.saveDrawing=()=>{try{state.drawings.main=c.toDataURL("image/png");save();$("feedback").innerHTML='<p class="good">'+(lang==="ar"?"تم حفظ الرسم على هذا الجهاز.":"Drawing saved on this device.")+'</p>'}catch(e){$("feedback").textContent="تعذر حفظ الرسم."}}
+}
+render();
+stats();
+</script>
+</body>
+</html>
