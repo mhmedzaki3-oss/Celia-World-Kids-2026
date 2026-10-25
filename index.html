@@ -137,6 +137,7 @@
 <div class="screen active" id="welcomeScreen">
   <div class="header">
     <div class="celia-img-container">
+      <!-- هنا يتم استدعاء صورة سيلا -->
       <img src="celia.jpg" alt="Celia" onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #d4af37, #e91e63)'; this.parentElement.innerHTML='<span style=\'font-size:50px; display:flex; justify-content:center; align-items:center; height:100%;\'>👧🏻</span>';">
     </div>
     <h1>Celia World Kids 2026</h1>
@@ -145,14 +146,14 @@
   <div class="instruction-box">
     <span class="icon">🌟</span>
     <p><b>أهلاً بك يا بطل!</b><br>هيا نلعب ونتعلم الحروف والصور مع سيليا.<br>اختر الإجابة الصحيحة واجمع النجوم!</p>
-    <button class="btn-primary" id="startAppBtn">ابدأ اللعب الآن</button>
+    <button class="btn-primary" id="startAppBtn" onclick="startApplication()">ابدأ اللعب الآن</button>
   </div>
 </div>
 
 <!-- HOME SCREEN -->
 <div class="screen" id="homeScreen">
   <div class="header">
-    <h1>Celia World Kids</h1>
+    <h1 id="homeTitle">اختر لعبة</h1>
   </div>
   <div class="games-grid" id="gamesGrid"></div>
 </div>
@@ -160,7 +161,7 @@
 <!-- GAME SCREEN -->
 <div class="screen" id="gameScreen">
   <div class="game-header">
-    <button class="back-btn" id="backBtn">← رجوع</button>
+    <button class="back-btn" onclick="goHome()">← رجوع</button>
     <span class="stars-display" id="starsDisplay">⭐ 0</span>
   </div>
   <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
@@ -168,7 +169,7 @@
   <div class="question-area">
     <div class="letter-display" id="currentLetter">أ</div>
     <div class="question-prompt" id="questionPrompt">اختر الصورة التي تبدأ بحرف الألف</div>
-    <button class="speak-btn" id="speakBtn">🔊 استمع</button>
+    <button class="speak-btn" onclick="speakCurrentWord()">🔊 استمع</button>
   </div>
   
   <div class="choices" id="choicesContainer"></div>
@@ -181,110 +182,112 @@
     <span class="trophy">🏆</span>
     <h2>أنت بطل!</h2>
     <p>لقد أكملت اللعبة بنجاح.</p>
-    <button class="btn-primary" id="winCloseBtn">العب مرة أخرى</button>
+    <button class="btn-primary" onclick="playAgain()">العب مرة أخرى</button>
   </div>
 </div>
 
 <script>
-// ============ Data & Config ============
-const T = {
-  ar: {
-    welcomeTitle: 'Celia World Kids 2026',
-    startBtn: 'ابدأ اللعب الآن',
-    homeTitle: 'اختر لعبة',
-    back: '← رجوع',
-    prompt: (letter) => `اختر الصورة التي تبدأ بحرف ${letter}`,
-    correct: '🌟 رائع! لقد كسبت نجمة',
-    wrong: '❌ حاول مرة أخرى',
-    winTitle: 'أنت بطل!',
-    winText: 'لقد أكملت اللعبة بنجاح.',
-    playAgain: 'العب مرة أخرى',
-    soon: 'قريبًا',
-    stars: '⭐'
-  },
-  en: {
-    welcomeTitle: 'Celia World Kids 2026',
-    startBtn: 'Start Playing',
-    homeTitle: 'Choose a Game',
-    back: '← Back',
-    prompt: (letter) => `Pick the picture starting with ${letter}`,
-    correct: '🌟 Great! You earned a star',
-    wrong: '❌ Try again',
-    winTitle: 'You are a Hero!',
-    winText: 'You finished the game successfully.',
-    playAgain: 'Play Again',
-    soon: 'Soon',
-    stars: '⭐'
-  }
-};
-let lang = 'ar';
-let t = T[lang];
-
+// ============ Config ============
 const GAMES = [
-  { id: 'letters', icon: '🔤', ar: 'حروف وصور',   en: 'Letters & Pictures', available: true },
-  { id: 'count',   icon: '🔢', ar: 'عدّ واكسب',   en: 'Count & Win',        available: false },
-  { id: 'colors',  icon: '🎨', ar: 'الألوان والأشكال', en: 'Colors & Shapes', available: false },
-  { id: 'animals', icon: '🐾', ar: 'الحيوانات',   en: 'Animals',            available: false },
-  { id: 'fruits',  icon: '🍎', ar: 'الفواكه',     en: 'Fruits',             available: false },
-  { id: 'numbers', icon: '🔟', ar: 'الأرقام',     en: 'Numbers',            available: false },
-  { id: 'opposites', icon: '↔️', ar: 'المتضادات', en: 'Opposites',          available: false },
-  { id: 'shapes',  icon: '⬛', ar: 'الأشكال',     en: 'Shapes',             available: false },
-  { id: 'memory',  icon: '🧠', ar: 'الذاكرة',     en: 'Memory',             available: false },
-  { id: 'sounds',  icon: '🔊', ar: 'الأصوات',     en: 'Sounds',             available: false },
+  { id: 'letters', icon: '🔤', name: 'حروف وصور', available: true },
+  { id: 'count', icon: '🔢', name: 'عدّ واكسب', available: false },
+  { id: 'colors', icon: '🎨', name: 'الألوان والأشكال', available: false },
+  { id: 'animals', icon: '🐾', name: 'الحيوانات', available: false },
+  { id: 'fruits', icon: '🍎', name: 'الفواكه', available: false },
+  { id: 'numbers', icon: '🔟', name: 'الأرقام', available: false },
+  { id: 'opposites', icon: '↔️', name: 'المتضادات', available: false },
+  { id: 'shapes', icon: '⬛', name: 'الأشكال', available: false },
+  { id: 'memory', icon: '🧠', name: 'الذاكرة', available: false },
+  { id: 'sounds', icon: '🔊', name: 'الأصوات', available: false },
 ];
 
 const LETTERS_DATA = [
-  { letter: 'أ', word: 'أسد', emoji: '🦁', choices: ['🦁', '🐱', '🐶', '🐘'], correctIndex: 0 },
-  { letter: 'ب', word: 'بطة', emoji: '🦆', choices: ['🐦', '🦆', '🐔', '🦅'], correctIndex: 1 },
-  { letter: 'ت', word: 'تفاح', emoji: '🍎', choices: ['🍌', '🍇', '🍎', '🍉'], correctIndex: 2 },
-  { letter: 'ج', word: 'جمل', emoji: '🐪', choices: ['🐪', '🐘', '🦒', '🐎'], correctIndex: 0 },
-  { letter: 'ح', word: 'حصان', emoji: '🐴', choices: ['🐮', '🐴', '🐑', '🐐'], correctIndex: 1 },
-  { letter: 'خ', word: 'خروف', emoji: '🐑', choices: ['🐐', '🐕', '🐑', '🐈'], correctIndex: 2 },
-  { letter: 'د', word: 'دجاجة', emoji: '🐔', choices: ['🐔', '🦃', '🦅', '🦉'], correctIndex: 0 },
-  { letter: 'س', word: 'سمكة', emoji: '🐟', choices: ['🐙', '🐟', '🦈', '🐬'], correctIndex: 1 },
+  { letter: 'أ', word: 'أسد', choices: ['🦁', '🐱', '🐶', '🐘'], correctIndex: 0 },
+  { letter: 'ب', word: 'بطة', choices: ['🐦', '🦆', '🐔', '🦅'], correctIndex: 1 },
+  { letter: 'ت', word: 'تفاح', choices: ['🍌', '🍇', '🍎', '🍉'], correctIndex: 2 },
+  { letter: 'ج', word: 'جمل', choices: ['🐪', '🐘', '🦒', '🐎'], correctIndex: 0 },
+  { letter: 'ح', word: 'حصان', choices: ['🐮', '🐴', '🐑', '🐐'], correctIndex: 1 },
+  { letter: 'خ', word: 'خروف', choices: ['🐐', '🐕', '🐑', '🐈'], correctIndex: 2 },
+  { letter: 'د', word: 'دجاجة', choices: ['🐔', '🦃', '🦅', '🦉'], correctIndex: 0 },
+  { letter: 'س', word: 'سمكة', choices: ['🐙', '🐟', '🦈', '🐬'], correctIndex: 1 },
 ];
 
 // ============ State ============
 let currentIndex = 0;
 let stars = 0;
 let locked = false;
-
-// ============ Audio ============
-const AudioCtx = window.AudioContext || window.webkitAudioContext;
 let audioCtx = null;
 
-function ensureAudio() {
-  if (!audioCtx) { try { audioCtx = new AudioCtx(); } catch(e) {} }
-  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+// ============ Audio (Safe) ============
+function initAudio() {
+  if (!audioCtx) {
+    try { 
+      window.AudioContext = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new AudioContext(); 
+    } catch(e) { console.log("Audio not supported"); }
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
 }
 
 function playTone(freq, duration, type = 'sine', vol = 0.1) {
   if (!audioCtx) return;
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  osc.type = type; osc.frequency.value = freq;
-  gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-  osc.connect(gain); gain.connect(audioCtx.destination);
-  osc.start(); osc.stop(audioCtx.currentTime + duration);
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type; osc.frequency.value = freq;
+    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + duration);
+  } catch(e) {}
 }
 
-function playCorrect() { ensureAudio(); playTone(523, 0.1); setTimeout(() => playTone(659, 0.1), 100); setTimeout(() => playTone(784, 0.2), 200); }
-function playWrong() { ensureAudio(); playTone(300, 0.15, 'sawtooth'); setTimeout(() => playTone(220, 0.2, 'sawtooth'), 120); }
+function playCorrect() { initAudio(); playTone(523, 0.1); setTimeout(() => playTone(659, 0.1), 100); setTimeout(() => playTone(784, 0.2), 200); }
+function playWrong() { initAudio(); playTone(300, 0.15, 'sawtooth'); setTimeout(() => playTone(220, 0.2, 'sawtooth'), 120); }
 
 function speakText(text) {
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = lang === 'ar' ? 'ar-SA' : 'en-US';
+    utterance.lang = 'ar-SA'; // Fixed Arabic for now
     utterance.rate = 0.9;
     window.speechSynthesis.speak(utterance);
   }
 }
 
-// ============ UI Logic ============
+function speakCurrentWord() {
+  if(currentIndex < LETTERS_DATA.length) {
+    const data = LETTERS_DATA[currentIndex];
+    speakText(data.letter + ' ' + data.word);
+  }
+}
+
+// ============ Navigation ============
+function startApplication() {
+  initAudio(); // تفعيل الصوت بضغطة المستخدم
+  showScreen('homeScreen');
+  renderHome();
+}
+
+function goHome() {
+  showScreen('homeScreen');
+  renderHome();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function playAgain() {
+  document.getElementById('winOverlay').classList.remove('show');
+  startGame();
+}
+
+// ============ Game Logic ============
 function renderHome() {
-  document.getElementById('homeTitle').textContent = t.homeTitle;
   const grid = document.getElementById('gamesGrid');
   grid.innerHTML = '';
   
@@ -293,14 +296,12 @@ function renderHome() {
     card.className = 'game-card' + (game.available ? '' : ' disabled');
     card.innerHTML = `
       <span class="icon">${game.icon}</span>
-      <span class="name">${lang === 'ar' ? game.ar : game.en}</span>
-      ${game.available ? '' : `<div class="soon">${t.soon}</div>`}
+      <span class="name">${game.name}</span>
+      ${game.available ? '' : `<div class="soon">قريبًا</div>`}
     `;
     
-    // ربط حدث الضغط بشكل مباشر لضمان عمله
     if (game.available) {
       card.onclick = function() { 
-        ensureAudio(); 
         startGame(); 
       };
     }
@@ -313,7 +314,6 @@ function startGame() {
   stars = 0;
   locked = false;
   showScreen('gameScreen');
-  document.getElementById('backBtn').textContent = t.back;
   updateStars();
   loadQuestion();
 }
@@ -323,22 +323,21 @@ function loadQuestion() {
   
   const data = LETTERS_DATA[currentIndex];
   document.getElementById('currentLetter').textContent = data.letter;
-  document.getElementById('questionPrompt').textContent = t.prompt(data.letter);
+  document.getElementById('questionPrompt').textContent = `اختر الصورة التي تبدأ بحرف ${data.letter}`;
   document.getElementById('feedback').textContent = '';
   document.getElementById('feedback').className = 'feedback';
   
   const progress = (currentIndex / LETTERS_DATA.length) * 100;
   document.getElementById('progressFill').style.width = progress + '%';
 
-  document.getElementById('speakBtn').onclick = () => speakText(data.letter + ' ' + data.word);
-
   const container = document.getElementById('choicesContainer');
   container.innerHTML = '';
+  
   data.choices.forEach((emoji, idx) => {
     const btn = document.createElement('button');
     btn.className = 'choice';
     btn.innerHTML = `<span>${emoji}</span>`;
-    btn.onclick = () => handleChoice(idx, data.correctIndex, btn);
+    btn.onclick = function() { handleChoice(idx, data.correctIndex, btn); };
     container.appendChild(btn);
   });
   locked = false;
@@ -352,14 +351,14 @@ function handleChoice(selected, correct, btn) {
     btn.classList.add('correct');
     stars++;
     updateStars();
-    document.getElementById('feedback').textContent = t.correct;
+    document.getElementById('feedback').textContent = '🌟 رائع! لقد كسبت نجمة';
     document.getElementById('feedback').className = 'feedback good';
     playCorrect();
-    speakText(lang === 'ar' ? 'أحسنت' : 'Great job');
+    speakText('أحسنت');
     setTimeout(() => { currentIndex++; loadQuestion(); }, 1500);
   } else {
     btn.classList.add('wrong');
-    document.getElementById('feedback').textContent = t.wrong;
+    document.getElementById('feedback').textContent = '❌ حاول مرة أخرى';
     document.getElementById('feedback').className = 'feedback bad';
     playWrong();
     setTimeout(() => { btn.classList.remove('wrong'); locked = false; }, 800);
@@ -367,59 +366,13 @@ function handleChoice(selected, correct, btn) {
 }
 
 function updateStars() {
-  document.getElementById('starsDisplay').textContent = `${t.stars} ${stars}`;
+  document.getElementById('starsDisplay').textContent = `⭐ ${stars}`;
 }
 
 function showWin() {
   document.getElementById('winOverlay').classList.add('show');
-  document.getElementById('winCloseBtn').textContent = t.playAgain;
-  speakText(t.winText);
+  speakText('أنت بطل! لقد أكملت اللعبة بنجاح');
 }
-
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-// ============ Event Listeners ============
-// ربط زر البداية
-document.getElementById('startAppBtn').onclick = function() {
-  ensureAudio();
-  showScreen('homeScreen');
-  renderHome(); // يتم استدعاؤها هنا لرسم الأزرار بعد ظهور الشاشة
-};
-
-document.getElementById('backBtn').onclick = function() {
-  showScreen('homeScreen');
-  renderHome();
-};
-
-document.getElementById('winCloseBtn').onclick = function() {
-  document.getElementById('winOverlay').classList.remove('show');
-  startGame();
-};
-
-// Language Toggle (Long press)
-let pressTimer = null;
-const titleEl = document.getElementById('homeTitle');
-const toggleLang = () => {
-  lang = lang === 'ar' ? 'en' : 'ar';
-  t = T[lang];
-  document.documentElement.lang = lang;
-  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-  renderHome();
-  if (document.getElementById('gameScreen').classList.contains('active')) {
-    document.getElementById('backBtn').textContent = t.back;
-    document.getElementById('questionPrompt').textContent = t.prompt(LETTERS_DATA[currentIndex]?.letter || '');
-    updateStars();
-  }
-};
-
-titleEl.addEventListener('mousedown', () => { pressTimer = setTimeout(toggleLang, 800); });
-titleEl.addEventListener('mouseup', () => clearTimeout(pressTimer));
-titleEl.addEventListener('touchstart', () => { pressTimer = setTimeout(toggleLang, 800); });
-titleEl.addEventListener('touchend', () => clearTimeout(pressTimer));
-
 </script>
 </body>
 </html>
