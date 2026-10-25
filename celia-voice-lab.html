@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -156,7 +155,16 @@ function message(text) {
 
 function render() {
   const q = lesson();
-  $("animal").textContent = q.emoji;
+  $("animal").replaceChildren();
+
+const animalImage = document.createElement("div");
+animalImage.textContent = q.emoji;
+animalImage.style.fontSize = "100px";
+animalImage.style.textAlign = "center";
+animalImage.style.minHeight = "125px";
+animalImage.style.display = "grid";
+animalImage.style.placeItems = "center";
+$("animal").appendChild(animalImage);
   $("question").textContent = english() ? q.en : q.ar;
   $("score").textContent = english()
     ? `Stars: ${stars}`
