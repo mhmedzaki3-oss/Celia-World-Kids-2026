@@ -1,378 +1,469 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2563eb">
 <title>Celia World Kids 2026</title>
 <style>
-  :root {
-    --primary: #d4af37; /* ذهبي */
-    --secondary: #e91e63; /* وردي */
-    --bg-gradient: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); /* أزرق ملكي */
-    --card-bg: rgba(255, 255, 255, 0.1);
-    --text-light: #ffffff;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  
-  body {
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    background: var(--bg-gradient);
-    min-height: 100vh;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: flex-start;
-    padding: 16px; color: var(--text-light); user-select: none;
-    overflow-x: hidden;
-  }
-
-  .screen { display: none; width: 100%; max-width: 600px; margin: 0 auto; }
-  .screen.active { display: block; animation: fadeIn 0.4s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-  /* ===== Welcome & Home Screens ===== */
-  .header { text-align: center; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; }
-  
-  .celia-img-container {
-    width: 120px; height: 120px;
-    border-radius: 50%;
-    border: 4px solid var(--primary);
-    box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
-    overflow: hidden;
-    margin-bottom: 12px;
-    background: #fff;
-  }
-  .celia-img-container img { width: 100%; height: 100%; object-fit: cover; }
-
-  h1 { font-size: 26px; color: var(--primary); margin-bottom: 4px; text-shadow: 1px 1px 2px #000; }
-  .copyright { font-size: 12px; color: #ddd; margin-bottom: 20px; }
-  
-  .instruction-box {
-    background: var(--card-bg); padding: 20px; border-radius: 16px;
-    text-align: center; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.2);
-  }
-  .instruction-box p { font-size: 15px; line-height: 1.6; margin-bottom: 15px; }
-  .instruction-box .icon { font-size: 40px; margin-bottom: 10px; display: block; }
-
-  .btn-primary {
-    background: linear-gradient(135deg, var(--primary), #f39c12);
-    color: #000; font-weight: bold; font-size: 18px;
-    border: none; border-radius: 30px; padding: 14px 30px;
-    cursor: pointer; width: 100%; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
-    transition: transform 0.1s;
-  }
-  .btn-primary:active { transform: scale(0.95); }
-
-  .games-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
-  .game-card {
-    background: var(--card-bg); border: 2px solid var(--primary);
-    border-radius: 16px; padding: 18px 12px; text-align: center;
-    cursor: pointer; transition: transform 0.1s, background 0.2s;
-  }
-  .game-card:active { transform: scale(0.95); }
-  .game-card.disabled { opacity: 0.5; cursor: not-allowed; border-color: #555; }
-  .game-card .icon { font-size: 36px; display: block; margin-bottom: 6px; }
-  .game-card .name { font-size: 14px; font-weight: bold; }
-  .game-card .soon { font-size: 10px; color: #aaa; margin-top: 4px; }
-
-  /* ===== Game Screen ===== */
-  .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-  .back-btn {
-    background: rgba(255,255,255,0.2); color: #fff; border: none; border-radius: 10px;
-    padding: 8px 16px; font-size: 14px; cursor: pointer; font-weight: bold;
-  }
-  .stars-display { font-size: 20px; font-weight: bold; color: #f1c40f; }
-
-  .progress-bar { background: rgba(255,255,255,0.2); height: 10px; border-radius: 5px; overflow: hidden; margin-bottom: 20px; }
-  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); transition: width 0.3s ease; width: 0%; }
-
-  .question-area { text-align: center; margin-bottom: 24px; }
-  .letter-display { font-size: 80px; font-weight: bold; color: var(--primary); text-shadow: 0 0 15px rgba(212, 175, 55, 0.5); }
-  .question-prompt { font-size: 16px; color: #ddd; margin-top: 10px; }
-  .speak-btn { background: none; border: 1px solid var(--primary); color: var(--primary); border-radius: 20px; padding: 4px 12px; font-size: 12px; margin-top: 10px; cursor: pointer; }
-
-  .choices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
-  .choice {
-    background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3);
-    border-radius: 16px; padding: 20px 8px; font-size: 60px;
-    cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; min-height: 100px;
-  }
-  .choice:active { transform: scale(0.95); }
-  .choice.correct { background: rgba(46,213,115,0.4); border-color: #2ed573; animation: pop 0.4s ease; }
-  .choice.wrong { background: rgba(235,77,75,0.4); border-color: #eb4d4b; animation: shake 0.4s ease; }
-  
-  @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-  @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
-
-  .feedback { text-align: center; font-size: 18px; font-weight: bold; min-height: 30px; margin-top: 10px; }
-  .feedback.good { color: #2ed573; }
-  .feedback.bad { color: #eb4d4b; }
-
-  /* Win Overlay */
-  .win-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.85);
-    display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
-  }
-  .win-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
-  .win-box {
-    background: var(--bg-gradient); border: 4px solid var(--primary);
-    border-radius: 20px; padding: 30px 20px; text-align: center;
-    max-width: 350px; width: 100%; box-shadow: 0 0 30px rgba(212,175,55,0.4);
-  }
-  .win-box .trophy { font-size: 70px; margin-bottom: 10px; display: block; }
-  .win-box h2 { font-size: 24px; margin-bottom: 10px; color: var(--primary); }
-  .win-box p { font-size: 16px; margin-bottom: 20px; }
-
-  @media (max-width: 400px) {
-    .choice { font-size: 45px; min-height: 80px; }
-    .letter-display { font-size: 60px; }
-    .celia-img-container { width: 90px; height: 90px; }
-    h1 { font-size: 22px; }
-  }
+:root {
+  --blue:#2563eb;
+  --pink:#ec4899;
+  --yellow:#facc15;
+  --white:#ffffff;
+  --bg:#eff6ff;
+  --text:#172554;
+  --green:#16a34a;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  font-family:Tahoma,Arial,sans-serif;
+  background:linear-gradient(135deg,#dbeafe,#fce7f3,#fef3c7);
+  color:var(--text);
+  text-align:center;
+  min-height:100vh;
+}
+header {
+  padding:16px 12px;
+  background:var(--blue);
+  color:white;
+  box-shadow:0 3px 12px #0002;
+}
+h1 { margin:5px 0; font-size:clamp(24px,5vw,36px); }
+header p { margin:8px 0 0; }
+.toolbar {
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:10px;
+  padding:14px;
+}
+button {
+  border:0;
+  border-radius:14px;
+  padding:12px 18px;
+  font-size:17px;
+  font-weight:bold;
+  cursor:pointer;
+  touch-action:manipulation;
+}
+button:focus-visible {
+  outline:3px solid #111827;
+  outline-offset:3px;
+}
+.language { background:#fff; color:#1d4ed8; }
+.sound { background:#fef08a; color:#713f12; }
+main {
+  width:min(94%,680px);
+  margin:0 auto 24px;
+}
+.panel {
+  background:#ffffffed;
+  border-radius:24px;
+  padding:20px;
+  margin:10px 0;
+  box-shadow:0 8px 25px #1e3a8a18;
+}
+.score {
+  display:flex;
+  justify-content:space-around;
+  gap:10px;
+  flex-wrap:wrap;
+  font-size:18px;
+  font-weight:bold;
+}
+#picture {
+  min-height:180px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin:12px auto;
+}
+#picture svg {
+  width:min(100%,260px);
+  height:190px;
+}
+#question {
+  font-size:clamp(22px,4vw,30px);
+  line-height:1.6;
+}
+.answers {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  margin-top:18px;
+}
+.answer {
+  background:#dbeafe;
+  color:#1e3a8a;
+  min-height:60px;
+  border:3px solid transparent;
+}
+.answer:hover { background:#bfdbfe; }
+.answer:disabled { cursor:default; opacity:1; }
+.answer.correct {
+  background:#dcfce7;
+  border-color:#16a34a;
+}
+.answer.wrong {
+  background:#fee2e2;
+  border-color:#dc2626;
+}
+#feedback {
+  min-height:48px;
+  margin:16px 0 8px;
+  font-size:21px;
+  font-weight:bold;
+}
+#next {
+  background:var(--pink);
+  color:white;
+  min-width:150px;
+}
+#progress {
+  height:12px;
+  background:#dbeafe;
+  border-radius:20px;
+  overflow:hidden;
+  margin:16px 0 4px;
+}
+#bar {
+  width:0%;
+  height:100%;
+  background:#22c55e;
+  transition:width .3s;
+}
+footer { padding:15px; font-size:14px; }
+[hidden] { display:none !important; }
+@media(max-width:420px) {
+  .panel { padding:14px; }
+  .answers { gap:8px; }
+  .answer { padding:10px 6px; font-size:15px; }
+}
 </style>
 </head>
 <body>
+<header>
+  <h1 id="title">🌟 عالم سيليا للأطفال 🌟</h1>
+  <p id="subtitle">نتعلم ونلعب ونفرح معًا!</p>
+</header>
 
-<!-- WELCOME SCREEN -->
-<div class="screen active" id="welcomeScreen">
-  <div class="header">
-    <div class="celia-img-container">
-      <!-- هنا يتم استدعاء صورة سيلا -->
-      <img src="celia.jpg" alt="Celia" onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #d4af37, #e91e63)'; this.parentElement.innerHTML='<span style=\'font-size:50px; display:flex; justify-content:center; align-items:center; height:100%;\'>👧🏻</span>';">
+<div class="toolbar">
+  <button class="language" id="languageButton">English</button>
+  <button class="sound" id="soundButton">🔊 اسمع السؤال</button>
+</div>
+
+<main>
+  <section class="panel">
+    <div class="score">
+      <span id="level">السؤال 1</span>
+      <span id="stars">⭐ النجوم: 0</span>
     </div>
-    <h1>Celia World Kids 2026</h1>
-    <p class="copyright">© جميع الحقوق محفوظة لـ سيليا احمد محمد</p>
-  </div>
-  <div class="instruction-box">
-    <span class="icon">🌟</span>
-    <p><b>أهلاً بك يا بطل!</b><br>هيا نلعب ونتعلم الحروف والصور مع سيليا.<br>اختر الإجابة الصحيحة واجمع النجوم!</p>
-    <button class="btn-primary" id="startAppBtn" onclick="startApplication()">ابدأ اللعب الآن</button>
-  </div>
-</div>
+    <div id="progress"><div id="bar"></div></div>
+  </section>
 
-<!-- HOME SCREEN -->
-<div class="screen" id="homeScreen">
-  <div class="header">
-    <h1 id="homeTitle">اختر لعبة</h1>
-  </div>
-  <div class="games-grid" id="gamesGrid"></div>
-</div>
+  <section class="panel" id="game">
+    <div id="picture" role="img" aria-label="رسمة تعليمية"></div>
+    <h2 id="question">استعد للعب!</h2>
+    <div class="answers" id="answers"></div>
+    <div id="feedback" aria-live="polite"></div>
+    <button id="next" hidden>السؤال التالي ➜</button>
+  </section>
 
-<!-- GAME SCREEN -->
-<div class="screen" id="gameScreen">
-  <div class="game-header">
-    <button class="back-btn" onclick="goHome()">← رجوع</button>
-    <span class="stars-display" id="starsDisplay">⭐ 0</span>
-  </div>
-  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-  
-  <div class="question-area">
-    <div class="letter-display" id="currentLetter">أ</div>
-    <div class="question-prompt" id="questionPrompt">اختر الصورة التي تبدأ بحرف الألف</div>
-    <button class="speak-btn" onclick="speakCurrentWord()">🔊 استمع</button>
-  </div>
-  
-  <div class="choices" id="choicesContainer"></div>
-  <div class="feedback" id="feedback"></div>
-</div>
+  <section class="panel" id="result" hidden>
+    <h2 id="resultTitle">أحسنت يا بطل! 🎉</h2>
+    <p id="resultText"></p>
+    <button id="restart" style="background:#2563eb;color:white">
+      العب مرة أخرى 🔄
+    </button>
+  </section>
+</main>
 
-<!-- WIN OVERLAY -->
-<div class="win-overlay" id="winOverlay">
-  <div class="win-box">
-    <span class="trophy">🏆</span>
-    <h2>أنت بطل!</h2>
-    <p>لقد أكملت اللعبة بنجاح.</p>
-    <button class="btn-primary" onclick="playAgain()">العب مرة أخرى</button>
-  </div>
-</div>
-
+<footer id="footer">Celia World Kids 2026</footer>
 <script>
-// ============ Config ============
-const GAMES = [
-  { id: 'letters', icon: '🔤', name: 'حروف وصور', available: true },
-  { id: 'count', icon: '🔢', name: 'عدّ واكسب', available: false },
-  { id: 'colors', icon: '🎨', name: 'الألوان والأشكال', available: false },
-  { id: 'animals', icon: '🐾', name: 'الحيوانات', available: false },
-  { id: 'fruits', icon: '🍎', name: 'الفواكه', available: false },
-  { id: 'numbers', icon: '🔟', name: 'الأرقام', available: false },
-  { id: 'opposites', icon: '↔️', name: 'المتضادات', available: false },
-  { id: 'shapes', icon: '⬛', name: 'الأشكال', available: false },
-  { id: 'memory', icon: '🧠', name: 'الذاكرة', available: false },
-  { id: 'sounds', icon: '🔊', name: 'الأصوات', available: false },
-];
-
-const LETTERS_DATA = [
-  { letter: 'أ', word: 'أسد', choices: ['🦁', '🐱', '🐶', '🐘'], correctIndex: 0 },
-  { letter: 'ب', word: 'بطة', choices: ['🐦', '🦆', '🐔', '🦅'], correctIndex: 1 },
-  { letter: 'ت', word: 'تفاح', choices: ['🍌', '🍇', '🍎', '🍉'], correctIndex: 2 },
-  { letter: 'ج', word: 'جمل', choices: ['🐪', '🐘', '🦒', '🐎'], correctIndex: 0 },
-  { letter: 'ح', word: 'حصان', choices: ['🐮', '🐴', '🐑', '🐐'], correctIndex: 1 },
-  { letter: 'خ', word: 'خروف', choices: ['🐐', '🐕', '🐑', '🐈'], correctIndex: 2 },
-  { letter: 'د', word: 'دجاجة', choices: ['🐔', '🦃', '🦅', '🦉'], correctIndex: 0 },
-  { letter: 'س', word: 'سمكة', choices: ['🐙', '🐟', '🦈', '🐬'], correctIndex: 1 },
-];
-
-// ============ State ============
-let currentIndex = 0;
-let stars = 0;
-let locked = false;
-let audioCtx = null;
-
-// ============ Audio (Safe) ============
-function initAudio() {
-  if (!audioCtx) {
-    try { 
-      window.AudioContext = window.AudioContext || window.webkitAudioContext;
-      audioCtx = new AudioContext(); 
-    } catch(e) { console.log("Audio not supported"); }
-  }
-  if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume();
-  }
-}
-
-function playTone(freq, duration, type = 'sine', vol = 0.1) {
-  if (!audioCtx) return;
-  try {
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = type; osc.frequency.value = freq;
-    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    osc.start(); osc.stop(audioCtx.currentTime + duration);
-  } catch(e) {}
-}
-
-function playCorrect() { initAudio(); playTone(523, 0.1); setTimeout(() => playTone(659, 0.1), 100); setTimeout(() => playTone(784, 0.2), 200); }
-function playWrong() { initAudio(); playTone(300, 0.15, 'sawtooth'); setTimeout(() => playTone(220, 0.2, 'sawtooth'), 120); }
-
-function speakText(text) {
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'ar-SA'; // Fixed Arabic for now
-    utterance.rate = 0.9;
-    window.speechSynthesis.speak(utterance);
-  }
-}
-
-function speakCurrentWord() {
-  if(currentIndex < LETTERS_DATA.length) {
-    const data = LETTERS_DATA[currentIndex];
-    speakText(data.letter + ' ' + data.word);
-  }
-}
-
-// ============ Navigation ============
-function startApplication() {
-  initAudio(); // تفعيل الصوت بضغطة المستخدم
-  showScreen('homeScreen');
-  renderHome();
-}
-
-function goHome() {
-  showScreen('homeScreen');
-  renderHome();
-}
-
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-function playAgain() {
-  document.getElementById('winOverlay').classList.remove('show');
-  startGame();
-}
-
-// ============ Game Logic ============
-function renderHome() {
-  const grid = document.getElementById('gamesGrid');
-  grid.innerHTML = '';
   
-  GAMES.forEach(game => {
-    const card = document.createElement('div');
-    card.className = 'game-card' + (game.available ? '' : ' disabled');
-    card.innerHTML = `
-      <span class="icon">${game.icon}</span>
-      <span class="name">${game.name}</span>
-      ${game.available ? '' : `<div class="soon">قريبًا</div>`}
-    `;
-    
-    if (game.available) {
-      card.onclick = function() { 
-        startGame(); 
-      };
+const lessons = [
+  {
+    arQ: "ما اسم هذا الحيوان؟",
+    enQ: "What animal is this?",
+    art: "🦁",
+    ar: ["أسد", "قطة", "سمكة", "أرنب"],
+    en: ["Lion", "Cat", "Fish", "Rabbit"],
+    correct: 0,
+    arWin: "أحسنت! هذا أسد شجاع! 🦁",
+    enWin: "Great! This is a brave lion! 🦁"
+  },
+  {
+    arQ: "ما اسم هذا الحيوان الكبير؟",
+    enQ: "What is this big animal?",
+    art: "🐘",
+    ar: ["كلب", "فيل", "عصفور", "حصان"],
+    en: ["Dog", "Elephant", "Bird", "Horse"],
+    correct: 1,
+    arWin: "رائع! هذا فيل! 🐘",
+    enWin: "Wonderful! This is an elephant! 🐘"
+  },
+  {
+    arQ: "أي حيوان يعيش في الماء؟",
+    enQ: "Which animal lives in water?",
+    art: "🐬",
+    ar: ["دولفين", "أسد", "قطة", "حصان"],
+    en: ["Dolphin", "Lion", "Cat", "Horse"],
+    correct: 0,
+    arWin: "ممتاز! الدولفين يعيش في الماء! 🐬",
+    enWin: "Excellent! Dolphins live in water! 🐬"
+  },
+  {
+    arQ: "ماذا تعطينا البقرة؟",
+    enQ: "What does a cow give us?",
+    art: "🐄",
+    ar: ["عصير", "ماء البحر", "لبن", "شاي"],
+    en: ["Juice", "Sea water", "Milk", "Tea"],
+    correct: 2,
+    arWin: "إجابة صحيحة! البقرة تعطينا اللبن! 🥛",
+    enWin: "Correct! A cow gives us milk! 🥛"
+  },
+  {
+    arQ: "كم ضلعًا للمثلث؟",
+    enQ: "How many sides does a triangle have?",
+    art: "🔺",
+    ar: ["ضلعان", "ثلاثة أضلاع", "أربعة أضلاع", "خمسة أضلاع"],
+    en: ["Two", "Three", "Four", "Five"],
+    correct: 1,
+    arWin: "برافو! للمثلث ثلاثة أضلاع! 🔺",
+    enWin: "Bravo! A triangle has three sides! 🔺"
+  },
+  {
+    arQ: "ما لون الموز الناضج عادةً؟",
+    enQ: "What color is a ripe banana usually?",
+    art: "🍌",
+    ar: ["أزرق", "أصفر", "بنفسجي", "أسود"],
+    en: ["Blue", "Yellow", "Purple", "Black"],
+    correct: 1,
+    arWin: "ممتاز! الموز الناضج أصفر! 🍌",
+    enWin: "Excellent! A ripe banana is yellow! 🍌"
+  },
+  {
+    arQ: "أي حيوان يستطيع الطيران؟",
+    enQ: "Which animal can fly?",
+    art: "🦋",
+    ar: ["فراشة", "فيل", "سمكة", "بقرة"],
+    en: ["Butterfly", "Elephant", "Fish", "Cow"],
+    correct: 0,
+    arWin: "أحسنت! الفراشة تستطيع الطيران! 🦋",
+    enWin: "Well done! A butterfly can fly! 🦋"
+  },
+  {
+    arQ: "أين يعيش السمك؟",
+    enQ: "Where do fish live?",
+    art: "🐟",
+    ar: ["على الشجرة", "في الماء", "في الصحراء", "فوق السحاب"],
+    en: ["In a tree", "In water", "In a desert", "In the clouds"],
+    correct: 1,
+    arWin: "رائع! السمك يعيش في الماء! 🐟",
+    enWin: "Great! Fish live in water! 🐟"
+  }
+];
+
+let language = "ar";
+let index = 0;
+let score = 0;
+let answered = false;
+let earnedQuestions = new Set();
+
+const $ = id => document.getElementById(id);
+
+function speak(text) {
+  if (!("speechSynthesis" in window)) {
+    $("feedback").textContent =
+      language === "ar"
+        ? "الصوت غير مدعوم في هذا المتصفح."
+        : "Speech is not supported by this browser.";
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = language === "ar" ? "ar-EG" : "en-US";
+  utterance.rate = 0.85;
+  utterance.pitch = 1.15;
+
+  const voices = window.speechSynthesis.getVoices();
+  const matchingVoice = voices.find(v =>
+    language === "ar"
+      ? v.lang.toLowerCase().startsWith("ar")
+      : v.lang.toLowerCase().startsWith("en")
+  );
+
+  if (matchingVoice) utterance.voice = matchingVoice;
+
+  window.speechSynthesis.speak(utterance);
+}
+
+function render() {
+  const q = lessons[index];
+  answered = false;
+
+  $("title").textContent =
+    language === "ar"
+      ? "🌟 عالم سيليا للأطفال 🌟"
+      : "🌟 Celia World Kids 🌟";
+
+  $("subtitle").textContent =
+    language === "ar"
+      ? "نتعلم ونلعب ونفرح معًا!"
+      : "Learn, play, and have fun together!";
+
+  $("languageButton").textContent =
+    language === "ar" ? "English" : "العربية";
+
+  $("soundButton").textContent =
+    language === "ar" ? "🔊 اسمع السؤال" : "🔊 Hear the question";
+
+  $("level").textContent =
+    language === "ar"
+      ? `السؤال ${index + 1} من ${lessons.length}`
+      : `Question ${index + 1} of ${lessons.length}`;
+
+  $("stars").textContent =
+    language === "ar"
+      ? `⭐ النجوم: ${score}`
+      : `⭐ Stars: ${score}`;
+
+  $("question").textContent = language === "ar" ? q.arQ : q.enQ;
+  $("picture").textContent = q.art;
+  $("picture").style.fontSize = "110px";
+  $("picture").style.lineHeight = "1.5";
+  $("picture").setAttribute(
+    "aria-label",
+    language === "ar" ? q.arQ : q.enQ
+  );
+
+  $("bar").style.width = `${(index / lessons.length) * 100}%`;
+  $("feedback").textContent = "";
+  $("next").hidden = true;
+  $("answers").replaceChildren();
+
+  const choices = language === "ar" ? q.ar : q.en;
+
+  choices.forEach((choice, choiceIndex) => {
+    const button = document.createElement("button");
+    button.className = "answer";
+    button.textContent = choice;
+    button.addEventListener("click", () => checkAnswer(choiceIndex));
+    $("answers").appendChild(button);
+  });
+
+  $("game").hidden = false;
+  $("result").hidden = true;
+
+  document.documentElement.lang = language;
+  document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
+}
+
+function checkAnswer(choiceIndex) {
+  if (answered) return;
+  answered = true;
+
+  const q = lessons[index];
+  const buttons = $("answers").querySelectorAll("button");
+  buttons.forEach(button => button.disabled = true);
+
+  if (choiceIndex === q.correct) {
+    buttons[choiceIndex].classList.add("correct");
+
+    if (!earnedQuestions.has(index)) {
+      earnedQuestions.add(index);
+      score++;
     }
-    grid.appendChild(card);
-  });
-}
 
-function startGame() {
-  currentIndex = 0;
-  stars = 0;
-  locked = false;
-  showScreen('gameScreen');
-  updateStars();
-  loadQuestion();
-}
+    $("feedback").textContent =
+      language === "ar" ? q.arWin : q.enWin;
 
-function loadQuestion() {
-  if (currentIndex >= LETTERS_DATA.length) { showWin(); return; }
-  
-  const data = LETTERS_DATA[currentIndex];
-  document.getElementById('currentLetter').textContent = data.letter;
-  document.getElementById('questionPrompt').textContent = `اختر الصورة التي تبدأ بحرف ${data.letter}`;
-  document.getElementById('feedback').textContent = '';
-  document.getElementById('feedback').className = 'feedback';
-  
-  const progress = (currentIndex / LETTERS_DATA.length) * 100;
-  document.getElementById('progressFill').style.width = progress + '%';
-
-  const container = document.getElementById('choicesContainer');
-  container.innerHTML = '';
-  
-  data.choices.forEach((emoji, idx) => {
-    const btn = document.createElement('button');
-    btn.className = 'choice';
-    btn.innerHTML = `<span>${emoji}</span>`;
-    btn.onclick = function() { handleChoice(idx, data.correctIndex, btn); };
-    container.appendChild(btn);
-  });
-  locked = false;
-}
-
-function handleChoice(selected, correct, btn) {
-  if (locked) return;
-  locked = true;
-  
-  if (selected === correct) {
-    btn.classList.add('correct');
-    stars++;
-    updateStars();
-    document.getElementById('feedback').textContent = '🌟 رائع! لقد كسبت نجمة';
-    document.getElementById('feedback').className = 'feedback good';
-    playCorrect();
-    speakText('أحسنت');
-    setTimeout(() => { currentIndex++; loadQuestion(); }, 1500);
+    speak(language === "ar" ? q.arWin : q.enWin);
   } else {
-    btn.classList.add('wrong');
-    document.getElementById('feedback').textContent = '❌ حاول مرة أخرى';
-    document.getElementById('feedback').className = 'feedback bad';
-    playWrong();
-    setTimeout(() => { btn.classList.remove('wrong'); locked = false; }, 800);
+    buttons[choiceIndex].classList.add("wrong");
+    buttons[q.correct].classList.add("correct");
+
+    $("feedback").textContent =
+      language === "ar"
+        ? "حاول مرة أخرى في السؤال القادم! 🌈"
+        : "Try again on the next question! 🌈";
+  }
+
+  $("stars").textContent =
+    language === "ar"
+      ? `⭐ النجوم: ${score}`
+      : `⭐ Stars: ${score}`;
+
+  $("next").hidden = false;
+  $("next").textContent =
+    index === lessons.length - 1
+      ? (language === "ar" ? "عرض النتيجة 🏆" : "See results 🏆")
+      : (language === "ar" ? "السؤال التالي ➜" : "Next question ➜");
+}
+
+function showResults() {
+  window.speechSynthesis?.cancel();
+  $("game").hidden = true;
+  $("result").hidden = false;
+  $("bar").style.width = "100%";
+
+  $("resultTitle").textContent =
+    language === "ar" ? "أحسنت يا بطل! 🎉" : "Well done! 🎉";
+
+  $("resultText").textContent =
+    language === "ar"
+      ? `جمعت ${score} من ${lessons.length} نجوم. استمر في التعلم واللعب!`
+      : `You earned ${score} out of ${lessons.length} stars. Keep learning and playing!`;
+
+  $("restart").textContent =
+    language === "ar" ? "العب مرة أخرى 🔄" : "Play again 🔄";
+
+  speak($("resultText").textContent);
+}
+
+function nextQuestion() {
+  if (index < lessons.length - 1) {
+    index++;
+    render();
+  } else {
+    showResults();
   }
 }
 
-function updateStars() {
-  document.getElementById('starsDisplay').textContent = `⭐ ${stars}`;
+function restartGame() {
+  index = 0;
+  score = 0;
+  earnedQuestions = new Set();
+  window.speechSynthesis?.cancel();
+  render();
 }
 
-function showWin() {
-  document.getElementById('winOverlay').classList.add('show');
-  speakText('أنت بطل! لقد أكملت اللعبة بنجاح');
-}
+$("languageButton").addEventListener("click", () => {
+  language = language === "ar" ? "en" : "ar";
+  window.speechSynthesis?.cancel();
+
+  if ($("result").hidden) {
+    render();
+  } else {
+    showResults();
+  }
+});
+
+$("soundButton").addEventListener("click", () => {
+  const q = lessons[index];
+  speak(language === "ar" ? q.arQ : q.enQ);
+});
+
+$("next").addEventListener("click", nextQuestion);
+$("restart").addEventListener("click", restartGame);
+
+render();
 </script>
 </body>
 </html>
+
