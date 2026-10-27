@@ -208,33 +208,41 @@ const stories=[
 function renderExplorer(){current='explorer';$('home').classList.add('hidden');$('stage').classList.remove('hidden');$('homeBtn').classList.remove('hidden');$('gameTitle').textContent=tr('🐾 اكتشف الحيوان والأثر','🐾 Animal & Ancient Places Explorer');$('feedback').textContent='';$('nextBtn').classList.add('hidden');let idx=0;function show(){let d=explorerItems[idx];$('playArea').innerHTML=`<div class="prompt" style="font-size:70px">${d.e}</div><h3 style="text-align:center">${lang==='ar'?d.ar:d.en}</h3><p style="font-size:20px;line-height:1.8;text-align:center">${lang==='ar'?d.da:d.de}</p><div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap"><button class="primary" id="speakBtn">🔊 ${tr('اسمع الوصف','Listen')}</button><button class="secondary" id="prevInfo">⬅️ ${tr('السابق','Previous')}</button><button class="primary" id="nextInfo">${tr('التالي','Next')} ➡️</button></div><p style="text-align:center">${idx+1} / ${explorerItems.length}</p>`;$('speakBtn').onclick=()=>{if(!('speechSynthesis'in window)){ $('feedback').textContent=tr('الصوت غير مدعوم في هذا المتصفح','Speech is not supported in this browser');return}speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(lang==='ar'?d.da:d.de);u.lang=lang==='ar'?'ar':'en-US';u.rate=.85;speechSynthesis.speak(u)};$('prevInfo').onclick=()=>{idx=(idx-1+explorerItems.length)%explorerItems.length;show()};$('nextInfo').onclick=()=>{idx=(idx+1)%explorerItems.length;show()}}show()}
 
 function renderStories(){
-  if(!isActivated && current === 'stories') {
-    let currentStoryIndex = window.currentStoryIndex || 0;
-    if(currentStoryIndex >= MAX_FREE_STORIES) {
-      showPurchase();
-      return;
-    }
-  }
   current='stories';
-  $('home').classList.add('hidden');$('stage').classList.remove('hidden');$('homeBtn').classList.remove('hidden');$('gameTitle').textContent=tr('📖 ركن الحواديت','📖 Story Corner');$('feedback').textContent='';$('nextBtn').classList.add('hidden');let idx=window.currentStoryIndex || 0;
+  $('home').classList.add('hidden');$('stage').classList.remove('hidden');$('homeBtn').classList.remove('hidden');$('gameTitle').textContent=tr('📖 ركن الحواديت','📖 Story Corner');$('feedback').textContent='';$('nextBtn').classList.add('hidden');
+  let idx = window.currentStoryIndex || 0;
   
   function show(){
+    // التحقق من القفل
     if(!isActivated && idx >= MAX_FREE_STORIES) {
        showPurchase();
-       idx = 0; 
+       return; // لا نعرض القصة
     }
     window.currentStoryIndex = idx;
     let d=stories[idx];
     $('playArea').innerHTML=`<div class="prompt">${idx+1}. ${lang==='ar'?d[0]:d[1]}</div><div style="font-size:20px;line-height:1.9;padding:12px;background:var(--paper);border-radius:18px">${lang==='ar'?d[2]:d[3]}</div><p style="text-align:center;font-weight:900">💡 ${tr('نتعلم:','We learn:')} ${lang==='ar'?d[4]:d[5]}</p><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="primary" id="speakStory">🔊 ${tr('اقرئي الحدوته','Read aloud')}</button><button class="secondary" id="prevStory">⬅️ ${tr('السابقة','Previous')}</button><button class="primary" id="nextStory">${tr('الحدوته التالية','Next story')} ➡️</button></div><p style="text-align:center">${idx+1} / 20</p>`;
+    
     $('speakStory').onclick=()=>{if(!('speechSynthesis'in window)){ $('feedback').textContent=tr('الصوت غير مدعوم في هذا المتصفح','Speech is not supported in this browser');return}speechSynthesis.cancel();let u=new SpeechSynthesisUtterance((lang==='ar'?d[0]+'. '+d[2]:d[1]+'. '+d[3]));u.lang=lang==='ar'?'ar':'en-US';u.rate=.82;speechSynthesis.speak(u)};
-    $('prevStory').onclick=()=>{idx=(idx-1+20)%20;show()};
-    $('nextStory').onclick=()=>{idx=(idx+1)%20;show()}
+    
+    $('prevStory').onclick=()=>{
+       if(idx > 0) { idx--; show(); }
+    };
+    
+    $('nextStory').onclick=()=>{
+       // إذا كان في القصة الثانية (idx=1) وضغط التالي (يريد الثالثة idx=2)
+       if(!isActivated && idx + 1 >= MAX_FREE_STORIES) {
+          showPurchase();
+       } else {
+          idx = (idx + 1) % 20; 
+          show();
+       }
+    };
   }
   show();
 }
 
 $('exploreBtn').onclick=renderExplorer;
-$('storiesBtn').onclick=renderStories;
+$('storiesBtn').onclick=()=>{ window.currentStoryIndex = 0; renderStories(); }; // إعادة التصفير عند فتح القصص من جديد
 $('langBtn').addEventListener('click',()=>{lang=lang==='ar'?'en':'ar';syncLang()});
 $('themeBtn').addEventListener('click',()=>setTheme(!document.body.classList.contains('dark')));
 $('musicBtn').addEventListener('click',()=>setMusic(!musicOn));
