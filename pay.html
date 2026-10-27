@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>اختبار نظام التفعيل - Celia World Kids</title>
+<style>
+  :root {
+    --primary: #354fc5;
+    --secondary: #e8eaf2;
+    --text: #20243a;
+    --success: #137547;
+    --error: #b42318;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+  body {
+    background: #f3f7fc;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 16px;
+  }
+  .container {
+    background: #fff;
+    width: 100%;
+    max-width: 400px;
+    padding: 24px;
+    border-radius: 20px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  h1 { font-size: 22px; color: #253b80; margin-bottom: 10px; }
+  p { font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
+  
+  .status-box {
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    display: none;
+  }
+  .status-box.active {
+    display: block;
+    background: #dcfce7;
+    color: var(--success);
+    border: 1px solid #bbf7d0;
+  }
+  .status-box.inactive {
+    display: block;
+    background: #fee2e2;
+    color: var(--error);
+    border: 1px solid #fecaca;
+  }
+
+  .price { font-size: 28px; font-weight: bold; color: #253b80; margin-bottom: 15px; }
+
+  a.btn, button.btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: opacity 0.2s;
+  }
+  a.btn:active, button.btn:active { opacity: 0.8; }
+  
+  .btn-primary { background: #168c50; color: #fff; }
+  .btn-secondary { background: var(--primary); color: #fff; }
+  .btn-outline { background: var(--secondary); color: var(--text); }
+
+  .input-group { margin-bottom: 15px; text-align: right; display: none; }
+  .input-group.show { display: block; }
+  .input-group label { display: block; font-size: 14px; margin-bottom: 5px; font-weight: bold; }
+  .input-group input {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #c9cede;
+    border-radius: 10px;
+    font-size: 16px;
+    text-align: center;
+    text-transform: uppercase;
+  }
+  
+  .message { font-size: 14px; font-weight: bold; min-height: 20px; margin-top: 10px; }
+  .message.error { color: var(--error); }
+  .message.success { color: var(--success); }
+  
+  .notice { font-size: 12px; color: #64748b; margin-top: 20px; line-height: 1.5; text-align: right; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🌟 عالم سيليا</h1>
+  <p>صفحة اختبار نظام التفعيل المستقل</p>
+
+  <!-- شريط الحالة -->
+  <div id="statusBox" class="status-box"></div>
+
+  <!-- واجهة الشراء -->
+  <div id="purchaseView">
+    <div class="price">49 جنيهًا مصريًا</div>
+    <p>لإتمام الشراء، تواصل عبر واتساب وسنرسل لك كود التفعيل.</p>
+    <a class="btn btn-primary" href="https://wa.me/201022918830?text=مرحباً،%20أرغب%20في%20شراء%20نسخة%20عالم%20سيليا" target="_blank" rel="noopener noreferrer">الشراء عبر واتساب</a>
+    <button class="btn btn-secondary" onclick="showActivationInput()">لديّ كود تفعيل</button>
+  </div>
+
+  <!-- واجهة إدخال الكود -->
+  <div id="activationView" class="input-group">
+    <label for="codeInput">أدخل كود التفعيل:</label>
+    <input type="text" id="codeInput" placeholder="CELIA-XXXX" autocomplete="off">
+    <button class="btn btn-primary" onclick="verifyCode()">تأكيد الكود</button>
+    <button class="btn btn-outline" onclick="hideActivationInput()">إلغاء</button>
+    <div id="feedbackMessage" class="message"></div>
+  </div>
+
+  <div class="notice">
+    ملاحظة للمطور: هذه الصفحة مخصصة للاختبار المحلي فقط. الكود السري مكتوب في الـ JavaScript، وهو غير آمن للحماية التجارية. للحماية الحقيقية يجب استخدام خادم (Backend) يتحقق من الدفع.
+  </div>
+</div>
+
+<script>
+  // الكود السري للاختبار
+  const SECRET_CODE = "CELIA-2026-VIP";
+  const STORAGE_KEY = "celia_test_activated";
+
+  // عناصر الواجهة
+  const statusBox = document.getElementById('statusBox');
+  const purchaseView = document.getElementById('purchaseView');
+  const activationView = document.getElementById('activationView');
+  const codeInput = document.getElementById('codeInput');
+  const feedbackMessage = document.getElementById('feedbackMessage');
+
+  // دالة التحقق من حالة التفعيل عند تحميل الصفحة
+  function checkStatus() {
+    const isActivated = localStorage.getItem(STORAGE_KEY) === "yes";
+    
+    if (isActivated) {
+      statusBox.textContent = "✅ الحالة: النسخة الكاملة مفعّلة.";
+      statusBox.className = "status-box active";
+      purchaseView.style.display = "none";
+      activationView.classList.remove('show');
+    } else {
+      statusBox.textContent = "🔒 الحالة: النسخة التجريبية (غير مفعّلة).";
+      statusBox.className = "status-box inactive";
+      purchaseView.style.display = "block";
+    }
+  }
+
+  // عرض حقل إدخال الكود
+  function showActivationInput() {
+    activationView.classList.add('show');
+    codeInput.focus();
+    feedbackMessage.textContent = "";
+  }
+
+  // إخفاء حقل إدخال الكود
+  function hideActivationInput() {
+    activationView.classList.remove('show');
+    codeInput.value = "";
+    feedbackMessage.textContent = "";
+  }
+
+  // دالة التحقق من الكود
+  function verifyCode() {
+    const enteredCode = codeInput.value.trim().toUpperCase();
+    
+    if (enteredCode === SECRET_CODE) {
+      // كود صحيح
+      feedbackMessage.textContent = "✅ تم التفعيل بنجاح! جاري تحديث الصفحة...";
+      feedbackMessage.className = "message success";
+      
+      // حفظ الحالة
+      localStorage.setItem(STORAGE_KEY, "yes");
+      
+      // إعادة تحميل الحالة بعد ثانية
+      setTimeout(() => {
+        checkStatus();
+        hideActivationInput();
+      }, 1500);
+      
+    } else {
+      // كود خاطئ
+      feedbackMessage.textContent = "❌ الكود غير صحيح. حاول مرة أخرى.";
+      feedbackMessage.className = "message error";
+      codeInput.value = "";
+      codeInput.focus();
+    }
+  }
+
+  // دالة لإعادة تعيين الحالة (لمسح الذاكرة واختبار الحالة من جديد)
+  // يمكنك استدعاؤها من الـ Console بكتابة: resetState()
+  window.resetState = function() {
+    localStorage.removeItem(STORAGE_KEY);
+    feedbackMessage.textContent = "تم مسح بيانات التفعيل من الذاكرة.";
+    feedbackMessage.className = "message success";
+    setTimeout(() => {
+      checkStatus();
+    }, 1000);
+  };
+
+  // تشغيل الفحص عند فتح الصفحة
+  checkStatus();
+
+  // إضافة حدث الضغط على Enter في حقل الإدخال
+  codeInput.addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+      verifyCode();
+    }
+  });
+</script>
+</body>
+</html>
